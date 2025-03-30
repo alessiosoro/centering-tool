@@ -28,7 +28,7 @@ button:hover {
   background-color: #666;
 }
 
-/* ========== CANVAS + GUIDE STYLE ========== */
+/* ========== CANVAS + GUIDES ========== */
 .canvas-container {
   position: relative;
   display: inline-block;
@@ -45,67 +45,40 @@ button:hover {
   z-index: 1;
 }
 
-/* Guide handles (drag points) */
 .guide-handle {
   position: absolute;
   z-index: 10;
   cursor: grab;
-  background-color: transparent;
+  pointer-events: all;
 }
 
-.guide-handle::before {
-  content: "";
-  position: absolute;
-  background-color: #fff;
-  border: 2px solid #000;
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  z-index: 15;
-}
-
-.guide-handle.horizontal::before {
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.guide-handle.vertical::before {
-  left: -6px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-/* Correct positioning relative to image */
-.canvas-container .guide-handle.horizontal {
+/* Orizzontali */
+.guide-handle.horizontal {
   width: 100%;
-  left: 0;
-  right: 0;
   height: 2px;
 }
 
-.canvas-container .guide-handle.vertical {
+/* Verticali */
+.guide-handle.vertical {
   height: 100%;
-  top: 0;
-  bottom: 0;
   width: 2px;
 }
 
-/* Colored lines */
+/* ======= LINE COLORS + MANIGLIA ======= */
 .topOuter {
-  background: repeating-linear-gradient(to right, #00ff00 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
 }
 
 .topInner {
-  background: repeating-linear-gradient(to right, #00cc00 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px);
 }
 
 .bottomOuter {
-  background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px);
 }
 
 .bottomInner {
-  background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px);
 }
 
 .leftOuter {
@@ -117,12 +90,50 @@ button:hover {
 }
 
 .rightOuter {
-  background: repeating-linear-gradient(to bottom, #4488ff 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px);
 }
 
 .rightInner {
-  background: repeating-linear-gradient(to bottom, #2266ff 0 2px, transparent 2px 6px);
+  background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
 }
+
+/* ======= MANIGLIE STILE CARTA ======= */
+.guide-handle::after {
+  content: "";
+  position: absolute;
+  background-color: currentColor;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  border: 1px solid #000;
+}
+
+/* Posizione per guide orizzontali */
+.horizontal::after {
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+}
+
+/* Posizione per guide verticali */
+.vertical::after {
+  top: 50%;
+  left: -6px;
+  width: 4px;
+  height: 14px;
+  transform: translateY(-50%);
+}
+
+/* Colori maniglia */
+.topOuter::after { background-color: #ff00ff; }
+.topInner::after { background-color: #ff69b4; }
+.bottomOuter::after { background-color: #ffaa00; }
+.bottomInner::after { background-color: #ffcc00; }
+
+.leftOuter::after { background-color: #ff4444; }
+.leftInner::after { background-color: #dd2222; }
+.rightOuter::after { background-color: #00ffff; }
+.rightInner::after { background-color: #00bfff; }
 
 /* ========== LAYOUT ========== */
 .container {
