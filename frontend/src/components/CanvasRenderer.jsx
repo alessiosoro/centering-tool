@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
-  const wrapperRef = useRef();
+  const containerRef = useRef();
   const imageRef = useRef();
   const [dragging, setDragging] = useState(null);
 
@@ -40,13 +40,13 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 
   return (
     <div className="canvas-container">
-      <div className="image-wrapper" ref={wrapperRef}>
+      <div className="image-wrapper" ref={containerRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
           const style = isHorizontal
             ? { top: `${val * 100}%` }
-            : { left: `${val * 100}%` };
+            : { left: `${val * 100}%`, height: "100%" };
 
           return (
             <div
