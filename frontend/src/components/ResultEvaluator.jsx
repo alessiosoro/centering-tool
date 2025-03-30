@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import "../index.css";
 
 function ResultEvaluator({ image, guides }) {
   const [result, setResult] = useState(null);
@@ -12,12 +13,12 @@ function ResultEvaluator({ image, guides }) {
 
     const blob = await (await fetch(image)).blob();
     const formData = new FormData();
-    formData.append('file', blob, 'card.png');
-    formData.append('guides', JSON.stringify(guides));
+    formData.append("file", blob, "card.png");
+    formData.append("guides", JSON.stringify(guides));
 
     try {
-      const res = await fetch('/evaluate', {
-        method: 'POST',
+      const res = await fetch("/evaluate", {
+        method: "POST",
         body: formData,
       });
       const data = await res.json();
@@ -35,28 +36,45 @@ function ResultEvaluator({ image, guides }) {
   };
 
   return (
-    <div className="result-box">
+    <div className="results-section">
       <h2>📊 Analisi con FastAPI</h2>
+
       <button onClick={handleAnalyze} className="analyze-button" disabled={loading}>
-        {loading ? "Analisi in corso..." : "🔍 Analizza con FastAPI"}
+        {loading ? "Analisi in corso..." : "🔍 Analizza la centratura"}
       </button>
 
       {result && (
-        <div className="results">
-          <p><b>Orizzontale:</b> {result.hor_percent}% ({result.left} mm / {result.right} mm)</p>
-          <p><b>Verticale:</b> {result.ver_percent}% ({result.top} mm / {result.bottom} mm)</p>
-          <p><b>Voti stimati:</b></p>
-          <ul>
-            <li>PSA: {result.psa}</li>
-            <li>BGS: {result.bgs}</li>
-            <li>SGC: {result.sgc}</li>
-          </ul>
+        <>
+          <div className="result-box">
+            <span><b>Orizzontale:</b> {result.hor_percent}%</span>
+            <span>Sinistra: {result.left} mm</span>
+            <span>Destra: {result.right} mm</span>
+          </div>
+
+          <div className="result-box">
+            <span><b>Verticale:</b> {result.ver_percent}%</span>
+            <span>Alto: {result.top} mm</span>
+            <span>Basso: {result.bottom} mm</span>
+          </div>
+
+          <div className="result-box">
+            <span className="badge">PSA</span> <strong>{result.psa}</strong>
+          </div>
+          <div className="result-box">
+            <span className="badge">BGS</span> <strong>{result.bgs}</strong>
+          </div>
+          <div className="result-box">
+            <span className="badge">SGC</span> <strong>{result.sgc}</strong>
+          </div>
+
           {pdfUrl && (
-            <a href={pdfUrl} download="report_centering.pdf" className="pdf-link">
-              📄 Scarica PDF
-            </a>
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <a href={pdfUrl} download="report_centering.pdf">
+                <button>📄 Scarica il PDF</button>
+              </a>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
