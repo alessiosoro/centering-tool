@@ -1,4 +1,3 @@
-/* ========== BASE DARK THEME ========== */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,7 +27,7 @@ button:hover {
   background-color: #666;
 }
 
-/* ========== CANVAS + GUIDES ========== */
+/* CANVAS */
 .canvas-container {
   display: flex;
   justify-content: center;
@@ -39,6 +38,7 @@ button:hover {
 .image-wrapper {
   position: relative;
   display: inline-block;
+  overflow: hidden; /* Impedisce che escano fuori */
 }
 
 .card-image {
@@ -50,51 +50,64 @@ button:hover {
   z-index: 1;
 }
 
-/* LINEE guida */
-.guide-line {
+.guide-layer {
   position: absolute;
-  z-index: 5;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-.guide-line.horizontal {
-  width: 100%;
-  height: 2px;
-}
-
-.guide-line.vertical {
-  height: 100%;
-  width: 2px;
-}
-
-/* CURSORI */
 .guide-handle {
   position: absolute;
   z-index: 20;
+  width: 100%;
+  height: 2px;
+  pointer-events: all;
   cursor: grab;
-  width: 40px;
-  height: 48px;
-  transform: translate(-50%, -50%);
 }
 
+/* Verticali */
+.guide-handle.vertical {
+  width: 2px;
+  height: 100%;
+}
+
+/* PNG cursor */
 .cursor-img {
-  width: 40px;
-  height: 48px;
-  user-select: none;
+  width: 80px;
+  height: 96px;
   pointer-events: none;
+  user-select: none;
 }
 
-/* ========== LINE COLORI ========== */
-.topOuter.guide-line { background-color: #ff00ff; }
-.topInner.guide-line { background-color: #ff69b4; }
-.bottomOuter.guide-line { background-color: #ffaa00; }
-.bottomInner.guide-line { background-color: #ffcc00; }
-.leftOuter.guide-line { background-color: #ff4444; }
-.leftInner.guide-line { background-color: #dd2222; }
-.rightOuter.guide-line { background-color: #00ffff; }
-.rightInner.guide-line { background-color: #00bfff; }
+/* ========== COLORI GUIDE ========== */
+.topOuter {
+  background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
+}
+.topInner {
+  background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px);
+}
+.bottomOuter {
+  background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px);
+}
+.bottomInner {
+  background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px);
+}
+.leftOuter {
+  background: repeating-linear-gradient(to bottom, #ff4444 0 2px, transparent 2px 6px);
+}
+.leftInner {
+  background: repeating-linear-gradient(to bottom, #dd2222 0 2px, transparent 2px 6px);
+}
+.rightOuter {
+  background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px);
+}
+.rightInner {
+  background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
+}
 
-/* ========== LAYOUT ========== */
+/* LAYOUT */
 .container {
   display: flex;
   justify-content: center;
@@ -145,7 +158,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* ========== UPLOADER ========== */
+/* UPLOADER */
 .uploader {
   border: 2px dashed #666;
   padding: 30px;
