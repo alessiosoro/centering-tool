@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
-
 import up_up from "../assets/up_up.png";
 import up_down from "../assets/up_down.png";
 import down_up from "../assets/down_up.png";
@@ -22,17 +21,18 @@ const cursorImages = {
 };
 
 const cursorOffset = {
-  topOuter: -20,
-  topInner: 20,
-  bottomOuter: -20,
-  bottomInner: 20,
-  leftOuter: -20,
-  leftInner: 20,
-  rightOuter: -20,
-  rightInner: 20,
+  topOuter: -40,
+  topInner: 40,
+  bottomOuter: -40,
+  bottomInner: 40,
+  leftOuter: -40,
+  leftInner: 40,
+  rightOuter: -40,
+  rightInner: 40,
 };
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
+  const wrapperRef = useRef();
   const imageRef = useRef();
   const [dragging, setDragging] = useState(null);
 
@@ -41,7 +41,9 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     setDragging({ key });
   };
 
-  const handleMouseUp = () => setDragging(null);
+  const handleMouseUp = () => {
+    setDragging(null);
+  };
 
   const handleMouseMove = (e) => {
     if (!dragging || !imageRef.current) return;
@@ -68,45 +70,50 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 
   return (
     <div className="canvas-container">
-      <div className="image-wrapper">
+      <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
+        <div className="guide-layer">
+          {Object.entries(guides).map(([key, val]) => {
+            const isHorizontal = key.includes("top") || key.includes("bottom");
+            const style = isHorizontal
+              ? { top: `${val * 100}%` }
+              : { left: `${val * 100}%` };
 
-        {/* Linee guida */}
-        {Object.entries(guides).map(([key, val]) => {
-          const isHorizontal = key.includes("top") || key.includes("bottom");
-          const style = isHorizontal
-            ? { top: `${val * 100}%` }
-            : { left: `${val * 100}%` };
-          const classes = `guide-line ${isHorizontal ? "horizontal" : "vertical"} ${key}`;
-          return <div key={`${key}-line`} className={classes} style={style} />;
-        })}
+            const cursor = cursorImages[key];
+            const offset = cursorOffset[key];
 
-        {/* Cursori */}
-        {Object.entries(guides).map(([key, val]) => {
-          const isHorizontal = key.includes("top") || key.includes("bottom");
-          const offset = cursorOffset[key] || 0;
-
-          const style = isHorizontal
-            ? {
-                top: `${val * 100}%`,
-                left: `calc(50% + ${offset}px)`,
-              }
-            : {
-                left: `${val * 100}%`,
-                top: `calc(50% + ${offset}px)`,
-              };
-
-          return (
-            <div
-              key={key}
-              className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"} ${key}`}
-              style={style}
-              onMouseDown={(e) => handleMouseDown(e, key)}
-            >
-              <img src={cursorImages[key]} alt={key} className="cursor-img" draggable={false} />
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={key}
+                className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"} ${key}`}
+                style={style}
+                onMouseDown={(e) => handleMouseDown(e, key)}
+              >
+                <img
+                  src={cursor}
+                  alt="cursor"
+                  className="cursor-img"
+                  style={
+                    isHorizontal
+                      ? {
+                          top: offset,
+                          position: "absolute",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                        }
+                      : {
+                          left: offset,
+                          position: "absolute",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                        }
+                  }
+                  draggable={false}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
