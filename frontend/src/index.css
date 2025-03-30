@@ -58,10 +58,10 @@ button:hover {
   height: 2px;
 }
 
-/* Verticali - Modifica per posizionare in base all'immagine */
+/* Verticali */
 .guide-handle.vertical {
   width: 2px;
-  height: 100%;  /* Altezza relativa all'immagine */
+  height: auto; /* Altezza dinamica */
 }
 
 /* ======= LINE COLORS + MANIGLIA ======= */
