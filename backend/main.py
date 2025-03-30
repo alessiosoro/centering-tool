@@ -54,10 +54,9 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
-    # 📸 Salva immagine temporanea in /tmp
+    # ✅ Salva immagine come JPEG reale in cartella sicura
     temp_path = "/tmp/temp_image.jpg"
-    with open(temp_path, "wb") as temp_file:
-        temp_file.write(image_data)
+    image.save(temp_path, format="JPEG")
 
     # 🧾 Crea PDF
     pdf = FPDF()
@@ -74,8 +73,10 @@ BGS: {bgs}
 SGC: {sgc}"""
     pdf.multi_cell(0, 10, text)
 
+    # ✅ Inserisce immagine nel PDF
     pdf.image(temp_path, x=30, y=80, w=150)
 
+    # 📤 Output PDF come base64
     pdf_output = io.BytesIO()
     pdf.output(pdf_output)
     pdf_output.seek(0)
@@ -94,5 +95,5 @@ SGC: {sgc}"""
         "pdf_base64": pdf_base64
     })
 
-# 🎯 Monta React frontend alla fine
+# 🖼️ Monta l’interfaccia React buildata
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
