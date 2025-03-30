@@ -1,65 +1,52 @@
-import React, { useState } from 'react';
+import React from "react";
+import "../index.css";
 
-function ResultEvaluator({ image, guides }) {
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null);
-
-  const handleAnalyze = async () => {
-    setLoading(true);
-    setResult(null);
-    setPdfUrl(null);
-
-    const blob = await (await fetch(image)).blob();
-    const formData = new FormData();
-    formData.append('file', blob, 'card.png');
-    formData.append('guides', JSON.stringify(guides));
-
-    try {
-      const res = await fetch('/evaluate', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-
-      setResult(data);
-
-      const pdfBlob = new Blob([Uint8Array.from(atob(data.pdf_base64), c => c.charCodeAt(0))], { type: 'application/pdf' });
-      const pdfBlobUrl = URL.createObjectURL(pdfBlob);
-      setPdfUrl(pdfBlobUrl);
-    } catch (err) {
-      console.error("Errore:", err);
-    }
-
-    setLoading(false);
-  };
-
+const ResultEvaluator = ({ result }) => {
   return (
-    <div className="result-box">
-      <h2>📊 Analisi con FastAPI</h2>
-      <button onClick={handleAnalyze} className="analyze-button" disabled={loading}>
-        {loading ? "Analisi in corso..." : "🔍 Analizza con FastAPI"}
-      </button>
-      {result && (
-        <div className="results">
-          <p><b>Orizzontale:</b> {result.hor_percent}% ({result.left} mm / {result.right} mm)</p>
-          <p><b>Verticale:</b> {result.ver_percent}% ({result.top} mm / {result.bottom} mm)</p>
-          <p><b>Centratura Globale:</b> {result.centering_global}%</p>
-          <p><b>Voti stimati:</b></p>
-          <ul>
-            <li>PSA: {result.psa}</li>
-            <li>BGS: {result.bgs}</li>
-            <li>SGC: {result.sgc}</li>
-          </ul>
-          {pdfUrl && (
-            <a href={pdfUrl} download="report_centering.pdf" className="pdf-link">
-              📄 Scarica PDF
-            </a>
-          )}
+    <div>
+      <h2>Risultati</h2>
+
+      <div className="result-box">
+        <span>Orizzontale: <strong>{result.hor_percent}%</strong></span>
+        <span>Sinistra: <strong>{result.left} mm</strong></span>
+        <span>Destra: <strong>{result.right} mm</strong></span>
+      </div>
+
+      <div className="result-box">
+        <span>Verticale: <strong>{result.ver_percent}%</strong></span>
+        <span>Alto: <strong>{result.top} mm</strong></span>
+        <span>Basso: <strong>{result.bottom} mm</strong></span>
+      </div>
+
+      <div className="result-box">
+        <span className="badge">Centratura Globale</span>
+        <strong>{Math.round((result.hor_percent + result.ver_percent) / 2)}%</strong>
+      </div>
+
+      <div className="result-box">
+        <span className="badge">PSA</span> <strong>{result.psa}</strong>
+      </div>
+
+      <div className="result-box">
+        <span className="badge">BGS</span> <strong>{result.bgs}</strong>
+      </div>
+
+      <div className="result-box">
+        <span className="badge">SGC</span> <strong>{result.sgc}</strong>
+      </div>
+
+      {result.pdf_base64 && (
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <a
+            href={`data:application/pdf;base64,${result.pdf_base64}`}
+            download="centering_report.pdf"
+          >
+            <button>📄 Scarica PDF</button>
+          </a>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default ResultEvaluator;
