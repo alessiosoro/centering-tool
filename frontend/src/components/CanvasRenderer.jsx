@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
+
 import up_up from "../assets/up_up.png";
 import up_down from "../assets/up_down.png";
 import down_up from "../assets/down_up.png";
@@ -20,7 +21,6 @@ const cursorImages = {
   rightInner: right_right,
 };
 
-// Offset per evitare sovrapposizione
 const cursorOffset = {
   topOuter: -20,
   topInner: 20,
@@ -33,7 +33,6 @@ const cursorOffset = {
 };
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
-  const wrapperRef = useRef();
   const imageRef = useRef();
   const [dragging, setDragging] = useState(null);
 
@@ -42,9 +41,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     setDragging({ key });
   };
 
-  const handleMouseUp = () => {
-    setDragging(null);
-  };
+  const handleMouseUp = () => setDragging(null);
 
   const handleMouseMove = (e) => {
     if (!dragging || !imageRef.current) return;
@@ -71,21 +68,33 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 
   return (
     <div className="canvas-container">
-      <div className="image-wrapper" ref={wrapperRef}>
+      <div className="image-wrapper">
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
+
+        {/* Linee guida */}
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
           const style = isHorizontal
+            ? { top: `${val * 100}%` }
+            : { left: `${val * 100}%` };
+          const classes = `guide-line ${isHorizontal ? "horizontal" : "vertical"} ${key}`;
+          return <div key={`${key}-line`} className={classes} style={style} />;
+        })}
+
+        {/* Cursori */}
+        {Object.entries(guides).map(([key, val]) => {
+          const isHorizontal = key.includes("top") || key.includes("bottom");
+          const offset = cursorOffset[key] || 0;
+
+          const style = isHorizontal
             ? {
-                "--y": val,
-                left: `calc(50% + ${cursorOffset[key]}px)`,
+                top: `${val * 100}%`,
+                left: `calc(50% + ${offset}px)`,
               }
             : {
-                "--x": val,
-                top: `calc(50% + ${cursorOffset[key]}px)`,
+                left: `${val * 100}%`,
+                top: `calc(50% + ${offset}px)`,
               };
-
-          const cursor = cursorImages[key];
 
           return (
             <div
@@ -94,12 +103,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
               style={style}
               onMouseDown={(e) => handleMouseDown(e, key)}
             >
-              <img
-                src={cursor}
-                alt="cursor"
-                className="cursor-img"
-                draggable={false}
-              />
+              <img src={cursorImages[key]} alt={key} className="cursor-img" draggable={false} />
             </div>
           );
         })}
