@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ImageUploader from "./components/ImageUploader";
 import CanvasRenderer from "./components/CanvasRenderer";
-import ResultEvaluator from './components/ResultEvaluator';
+import ResultEvaluator from "./components/ResultEvaluator";
 import "./index.css";
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
     rightOuter: 0.90,
     rightInner: 0.95,
   });
+  const [result, setResult] = useState(null);
 
   const handleGuideChange = (key, value) => {
     setGuides((prev) => ({ ...prev, [key]: value }));
@@ -25,7 +26,39 @@ function App() {
   const handleUpload = (file, preview) => {
     setImageFile(file);
     setImagePreview(preview);
+    setResult(null);
   };
+
+  const resetApp = () => {
+    window.location.reload();
+  };
+
+  const evaluateLive = async () => {
+    if (!imageFile) return;
+
+    const formData = new FormData();
+    formData.append("file", imageFile);
+    formData.append("guides", JSON.stringify(guides));
+
+    try {
+      const res = await fetch("/evaluate", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      setResult(data);
+    } catch (error) {
+      console.error("Errore analisi live:", error);
+    }
+  };
+
+  // 🔄 Ricalcola ogni volta che i cursori cambiano
+  useEffect(() => {
+    if (imageFile) {
+      evaluateLive();
+    }
+  }, [guides]);
 
   return (
     <div>
@@ -37,10 +70,15 @@ function App() {
         <div className="container">
           <div className="image-section">
             <CanvasRenderer image={imagePreview} guides={guides} onGuideChange={handleGuideChange} />
+            <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+              <button onClick={resetApp}>🔄 Carica nuova immagine</button>
+            </div>
           </div>
-          <div className="results-section">
-            <ResultEvaluator image={imagePreview} guides={guides} />
-          </div>
+          {result && (
+            <div className="results-section">
+              <ResultEvaluator result={result} />
+            </div>
+          )}
         </div>
       )}
     </div>
