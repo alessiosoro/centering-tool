@@ -20,15 +20,16 @@ const cursorImages = {
   rightInner: right_right,
 };
 
-const offsetMap = {
-  topOuter: -24,
-  topInner: +8,
-  bottomOuter: -24,
-  bottomInner: +8,
-  leftOuter: -24,
-  leftInner: +8,
-  rightOuter: -24,
-  rightInner: +8,
+// Offset per evitare sovrapposizione
+const cursorOffset = {
+  topOuter: -20,
+  topInner: 20,
+  bottomOuter: -20,
+  bottomInner: 20,
+  leftOuter: -20,
+  leftInner: 20,
+  rightOuter: -20,
+  rightInner: 20,
 };
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
@@ -74,20 +75,17 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-          const cursor = cursorImages[key];
-          const offset = offsetMap[key] || 0;
-
           const style = isHorizontal
             ? {
                 top: `${val * 100}%`,
-                left: `calc(50% + ${offset}px)`,
-                transform: "translate(-50%, -50%)",
+                left: `calc(50% + ${cursorOffset[key]}px)`,
               }
             : {
                 left: `${val * 100}%`,
-                top: `calc(50% + ${offset}px)`,
-                transform: "translate(-50%, -50%)",
+                top: `calc(50% + ${cursorOffset[key]}px)`,
               };
+
+          const cursor = cursorImages[key];
 
           return (
             <div
@@ -98,7 +96,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
             >
               <img
                 src={cursor}
-                alt={`cursor-${key}`}
+                alt="cursor"
                 className="cursor-img"
                 draggable={false}
               />
