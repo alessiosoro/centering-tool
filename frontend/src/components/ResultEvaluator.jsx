@@ -20,7 +20,7 @@ const ResultEvaluator = ({ result }) => {
 
       <div className="result-box">
         <span className="badge">Centratura Globale</span>
-        <strong>{result.global_percent}%</strong>
+        <strong>{result.global_centering}%</strong>
       </div>
 
       <div className="result-box">
