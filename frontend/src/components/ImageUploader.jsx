@@ -64,3 +64,4 @@ const ImageUploader = ({ onImageUpload }) => {
 };
 
 export default ImageUploader;
+
