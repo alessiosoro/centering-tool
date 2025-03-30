@@ -52,6 +52,29 @@ button:hover {
   background-color: transparent;
 }
 
+.guide-handle::before {
+  content: "";
+  position: absolute;
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  z-index: 15;
+}
+
+.guide-handle.horizontal::before {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.guide-handle.vertical::before {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .guide-handle.horizontal {
   width: 100%;
   height: 2px;
@@ -169,4 +192,3 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
-
