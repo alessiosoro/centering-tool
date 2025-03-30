@@ -60,8 +60,8 @@ button:hover {
 
 /* Verticali */
 .guide-handle.vertical {
+  height: 100%;
   width: 2px;
-  height: auto; /* Altezza dinamica */
 }
 
 /* ======= LINE COLORS + MANIGLIA ======= */
