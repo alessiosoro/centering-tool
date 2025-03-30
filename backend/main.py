@@ -26,18 +26,25 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    # ✅ Calcolo margini positivi
-    left = abs((g["leftInner"] - g["leftOuter"]) * w)
-    right = abs((g["rightOuter"] - g["rightInner"]) * w)
-    top = abs((g["topInner"] - g["topOuter"]) * h)
-    bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
+    # Calcolo distanze in pixel
+    left = (g["leftInner"] - g["leftOuter"]) * w
+    right = (g["rightOuter"] - g["rightInner"]) * w
+    top = (g["topInner"] - g["topOuter"]) * h
+    bottom = (g["bottomOuter"] - g["bottomInner"]) * h
 
     totalH = left + right
     totalV = top + bottom
 
-    horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
-    verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
+    # Percentuali realistiche con controllo su zero
+    horPercent = round((left / totalH) * 1000) / 10 if totalH > 0 else 0
+    verPercent = round((top / totalV) * 1000) / 10 if totalV > 0 else 0
 
+    # ✅ Centratura globale (media degli scostamenti da 50%)
+    hor_dev = abs(horPercent - 50)
+    ver_dev = abs(verPercent - 50)
+    global_centering = round(100 - ((hor_dev + ver_dev) / 2), 1)
+
+    # ✅ Punteggi realistici
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -51,9 +58,9 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         else:
             return 6
 
-    psa = score(horPercent, 5)
-    bgs = score(horPercent, 3)
-    sgc = score(horPercent, 6)
+    psa = score(global_centering, 5)
+    bgs = score(global_centering, 3)
+    sgc = score(global_centering, 6)
 
     # Colori delle linee guida
     colors = {
@@ -67,22 +74,24 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         "rightInner": "#00bfff",
     }
 
-    # 🖍️ Disegno le linee guida sull’immagine
+    # ✅ Disegno linee guida all'interno dell'immagine
     draw = ImageDraw.Draw(image)
     for key, val in g.items():
         if "top" in key or "bottom" in key:
             y = int(h * val)
+            y = max(0, min(h - 1, y))
             draw.line([(0, y), (w, y)], fill=colors.get(key, "#ffffff"), width=2)
         else:
             x = int(w * val)
+            x = max(0, min(w - 1, x))
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # 📸 Salva immagine con linee
+    # Salvataggio immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # 🧾 Crea PDF
+    # Creo PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -91,6 +100,8 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     pdf.ln(10)
     text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
+
+Centratura Globale: {global_centering}%
 
 PSA: {psa}
 BGS: {bgs}
@@ -108,11 +119,12 @@ SGC: {sgc}"""
         "right": round(right, 2),
         "top": round(top, 2),
         "bottom": round(bottom, 2),
+        "global_centering": global_centering,
         "psa": psa,
         "bgs": bgs,
         "sgc": sgc,
         "pdf_base64": pdf_base64
     })
 
-# 🎯 Monta frontend React
+# Monta frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
