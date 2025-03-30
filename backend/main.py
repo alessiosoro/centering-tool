@@ -53,6 +53,11 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
+    # 📸 Salva immagine temporanea
+    with open("temp_image.jpg", "wb") as temp_file:
+        temp_file.write(image_data)
+
+    # 🧾 Crea PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -66,11 +71,14 @@ PSA: {psa}
 BGS: {bgs}
 SGC: {sgc}"""
     pdf.multi_cell(0, 10, text)
+
+    # Inserisce immagine da file
+    pdf.image("temp_image.jpg", x=30, y=80, w=150)
+
+    # PDF in memoria
     pdf_output = io.BytesIO()
-    pdf.image(io.BytesIO(image_data), x=30, y=80, w=150)
     pdf.output(pdf_output)
     pdf_output.seek(0)
-
     pdf_base64 = base64.b64encode(pdf_output.read()).decode()
 
     return JSONResponse(content={
@@ -86,5 +94,5 @@ SGC: {sgc}"""
         "pdf_base64": pdf_base64
     })
 
-# Monta React frontend SOLO alla fine!
+# 🎯 Monta React frontend alla fine
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
