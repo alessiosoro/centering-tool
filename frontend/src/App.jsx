@@ -17,7 +17,6 @@ function App() {
     rightOuter: 0.90,
     rightInner: 0.95,
   });
-  const [result, setResult] = useState(null);
 
   const handleGuideChange = (key, value) => {
     setGuides((prev) => ({ ...prev, [key]: value }));
@@ -26,21 +25,6 @@ function App() {
   const handleUpload = (file, preview) => {
     setImageFile(file);
     setImagePreview(preview);
-    setResult(null); // reset result
-  };
-
-  const handleEvaluate = async () => {
-    const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("guides", JSON.stringify(guides));
-
-    const res = await fetch("/evaluate", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    setResult(data);
   };
 
   return (
@@ -49,21 +33,14 @@ function App() {
       {!imagePreview && (
         <ImageUploader onImageUpload={handleUpload} />
       )}
-
       {imagePreview && (
         <div className="container">
           <div className="image-section">
             <CanvasRenderer image={imagePreview} guides={guides} onGuideChange={handleGuideChange} />
-            <div style={{ marginTop: "20px" }}>
-              <button onClick={handleEvaluate}>Analizza con FastAPI</button>
-            </div>
           </div>
-
-          {result && (
-            <div className="results-section">
-              <ResultEvaluator image={imagePreview} guides={guides} />
-            </div>
-          )}
+          <div className="results-section">
+            <ResultEvaluator image={imagePreview} guides={guides} />
+          </div>
         </div>
       )}
     </div>
