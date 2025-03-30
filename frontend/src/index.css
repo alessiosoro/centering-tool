@@ -39,7 +39,7 @@ button:hover {
 .image-wrapper {
   position: relative;
   display: inline-block;
-  width: 100%;
+  max-width: 100%;
 }
 
 .card-image {
@@ -51,73 +51,119 @@ button:hover {
   z-index: 1;
 }
 
-/* === LINEE === */
+/* ====== GUIDE HANDLES ====== */
 .guide-handle {
   position: absolute;
-  z-index: 10;
+  z-index: 20;
   cursor: grab;
-  pointer-events: all;
+  width: 80px;
+  height: 96px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: auto;
 }
 
-/* Orizzontali */
-.guide-handle.horizontal {
-  width: 100%;
-  height: 2px;
-}
-
-/* Verticali */
-.guide-handle.vertical {
-  height: 100%;
-  width: 2px;
-}
-
-/* ======= LINE COLORS ======= */
-.topOuter {
-  background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
-}
-.topInner {
-  background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px);
-}
-.bottomOuter {
-  background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px);
-}
-.bottomInner {
-  background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px);
-}
-.leftOuter {
-  background: repeating-linear-gradient(to bottom, #ff4444 0 2px, transparent 2px 6px);
-}
-.leftInner {
-  background: repeating-linear-gradient(to bottom, #dd2222 0 2px, transparent 2px 6px);
-}
-.rightOuter {
-  background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px);
-}
-.rightInner {
-  background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
-}
-
-/* ======= MANIGLIE IMMAGINE ======= */
-.guide-handle img.cursor-image {
-  position: absolute;
-  width: 40px;
-  height: 48px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-/* Posizionamento maniglie */
-.guide-handle.horizontal img.cursor-image {
-  top: 0;
+/* Posizionamento (centro su linea) */
+.horizontal {
   left: 50%;
+  transform: translateX(-50%);
 }
 
-.guide-handle.vertical img.cursor-image {
+.vertical {
   top: 50%;
-  left: 0;
+  transform: translateY(-50%);
 }
 
-/* ========== LAYOUT ========== */
+/* Guide verticali (sinistra/destra) */
+.leftOuter, .leftInner, .rightOuter, .rightInner {
+  width: 2px;
+  top: 0;
+  bottom: 0;
+}
+
+/* Guide orizzontali (alto/basso) */
+.topOuter, .topInner, .bottomOuter, .bottomInner {
+  height: 2px;
+  left: 0;
+  right: 0;
+}
+
+/* ====== COLORI LINEE ====== */
+.topOuter { background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px); }
+.topInner { background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px); }
+.bottomOuter { background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px); }
+.bottomInner { background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px); }
+.leftOuter { background: repeating-linear-gradient(to bottom, #ff4444 0 2px, transparent 2px 6px); }
+.leftInner { background: repeating-linear-gradient(to bottom, #dd2222 0 2px, transparent 2px 6px); }
+.rightOuter { background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px); }
+.rightInner { background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px); }
+
+/* ====== CURSORI PNG ====== */
+.topOuter::after {
+  content: "";
+  background-image: url('./assets/up_up.png');
+}
+.topInner::after {
+  content: "";
+  background-image: url('./assets/up_down.png');
+}
+.bottomOuter::after {
+  content: "";
+  background-image: url('./assets/down_up.png');
+}
+.bottomInner::after {
+  content: "";
+  background-image: url('./assets/down_down.png');
+}
+.leftOuter::after {
+  content: "";
+  background-image: url('./assets/left_left.png');
+}
+.leftInner::after {
+  content: "";
+  background-image: url('./assets/left_right.png');
+}
+.rightOuter::after {
+  content: "";
+  background-image: url('./assets/right_left.png');
+}
+.rightInner::after {
+  content: "";
+  background-image: url('./assets/right_right.png');
+}
+
+.guide-handle::after {
+  content: "";
+  position: absolute;
+  width: 80px;
+  height: 96px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/* Posizionamento cursori PNG */
+.topOuter::after, .topInner::after {
+  top: -48px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bottomOuter::after, .bottomInner::after {
+  bottom: -48px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.leftOuter::after, .leftInner::after {
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.rightOuter::after, .rightInner::after {
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ========== LAYOUT + RISULTATI ========== */
 .container {
   display: flex;
   justify-content: center;
