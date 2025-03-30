@@ -1,126 +1,89 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from "react";
+import "./index.css";
 
-function CanvasRenderer({ image, onGuidesChange }) {
-  const canvasRef = useRef(null);
-  const [guides, setGuides] = useState({
-    topOuter: 0.05,
-    bottomOuter: 0.95,
-    leftOuter: 0.05,
-    rightOuter: 0.95,
-    topInner: 0.15,
-    bottomInner: 0.85,
-    leftInner: 0.15,
-    rightInner: 0.85,
-  });
-  const [draggingGuide, setDraggingGuide] = useState(null);
+const CanvasRenderer = ({ image, guides, onGuideChange }) => {
+  const containerRef = useRef(null);
 
-  const draw = (ctx, img, width, height) => {
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
+  const drawLines = (ctx, width, height) => {
+    const colorMap = {
+      topOuter: "#00ff00",
+      topInner: "#00cc00",
+      bottomOuter: "#ffcc00",
+      bottomInner: "#ffaa00",
+      leftOuter: "#ff4444",
+      leftInner: "#dd2222",
+      rightOuter: "#4488ff",
+      rightInner: "#2266ff",
+    };
 
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 1;
 
-    const drawLine = (x1, y1, x2, y2) => {
+    Object.entries(guides).forEach(([key, val]) => {
+      const pos = key.includes("top") || key.includes("bottom") ? val * height : val * width;
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    };
+      ctx.strokeStyle = colorMap[key] || "#ffffff";
 
-    const drawHandle = (x, y) => {
-      ctx.fillStyle = 'white';
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.stroke();
-    };
-
-    const lines = {
-      topOuter: [0, guides.topOuter * height, width, guides.topOuter * height],
-      bottomOuter: [0, guides.bottomOuter * height, width, guides.bottomOuter * height],
-      leftOuter: [guides.leftOuter * width, 0, guides.leftOuter * width, height],
-      rightOuter: [guides.rightOuter * width, 0, guides.rightOuter * width, height],
-      topInner: [0, guides.topInner * height, width, guides.topInner * height],
-      bottomInner: [0, guides.bottomInner * height, width, guides.bottomInner * height],
-      leftInner: [guides.leftInner * width, 0, guides.leftInner * width, height],
-      rightInner: [guides.rightInner * width, 0, guides.rightInner * width, height],
-    };
-
-    Object.entries(lines).forEach(([key, [x1, y1, x2, y2]]) => {
-      drawLine(x1, y1, x2, y2);
-      drawHandle((x1 + x2) / 2, (y1 + y2) / 2);
-    });
-  };
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      draw(ctx, img, img.width, img.height);
-    };
-    img.src = image;
-  }, [image, guides]);
-
-  useEffect(() => {
-    if (onGuidesChange) onGuidesChange(guides);
-  }, [guides]);
-
-  const getMousePos = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    return {
-      x: (e.clientX - rect.left) * (canvasRef.current.width / rect.width),
-      y: (e.clientY - rect.top) * (canvasRef.current.height / rect.height),
-    };
-  };
-
-  const handleMouseDown = (e) => {
-    const pos = getMousePos(e);
-    const tolerance = 10;
-    const w = canvasRef.current.width;
-    const h = canvasRef.current.height;
-
-    for (const [key, value] of Object.entries(guides)) {
-      const isH = key.includes('top') || key.includes('bottom');
-      const linePos = isH ? value * h : value * w;
-      const dist = isH ? Math.abs(pos.y - linePos) : Math.abs(pos.x - linePos);
-      if (dist < tolerance) {
-        setDraggingGuide(key);
-        break;
+      if (key.includes("top") || key.includes("bottom")) {
+        ctx.moveTo(0, pos);
+        ctx.lineTo(width, pos);
+      } else {
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, height);
       }
-    }
+
+      ctx.stroke();
+    });
+
+    ctx.setLineDash([]);
   };
 
-  const handleMouseMove = (e) => {
-    if (!draggingGuide) return;
-    const pos = getMousePos(e);
-    const w = canvasRef.current.width;
-    const h = canvasRef.current.height;
-    const isH = draggingGuide.includes('top') || draggingGuide.includes('bottom');
-    const newPos = isH ? pos.y / h : pos.x / w;
+  const handleMouseDown = (e, guideKey) => {
+    e.preventDefault();
+    const rect = containerRef.current.getBoundingClientRect();
+    const startX = e.clientX - rect.left;
+    const startY = e.clientY - rect.top;
+    const width = containerRef.current.offsetWidth;
+    const height = containerRef.current.offsetHeight;
 
-    setGuides((prev) => ({
-      ...prev,
-      [draggingGuide]: Math.max(0, Math.min(1, newPos)),
-    }));
+    const moveHandler = (moveEvent) => {
+      const x = moveEvent.clientX - rect.left;
+      const y = moveEvent.clientY - rect.top;
+
+      const val = guideKey.includes("top") || guideKey.includes("bottom") ? y / height : x / width;
+      onGuideChange(guideKey, Math.min(Math.max(val, 0), 1));
+    };
+
+    const upHandler = () => {
+      window.removeEventListener("mousemove", moveHandler);
+      window.removeEventListener("mouseup", upHandler);
+    };
+
+    window.addEventListener("mousemove", moveHandler);
+    window.addEventListener("mouseup", upHandler);
   };
-
-  const handleMouseUp = () => setDraggingGuide(null);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="centering-canvas"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    />
+    <div ref={containerRef} className="canvas-container">
+      {image && (
+        <>
+          <img src={image} alt="Card" className="card-image" />
+          {Object.entries(guides).map(([key, val]) => (
+            <div
+              key={key}
+              className={`guide-handle ${key.includes("top") || key.includes("bottom") ? "horizontal" : "vertical"} ${key}`}
+              style={
+                key.includes("top") || key.includes("bottom")
+                  ? { top: `${val * 100}%` }
+                  : { left: `${val * 100}%` }
+              }
+              onMouseDown={(e) => handleMouseDown(e, key)}
+            />
+          ))}
+        </>
+      )}
+    </div>
   );
-}
+};
 
 export default CanvasRenderer;
