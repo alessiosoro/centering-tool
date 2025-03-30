@@ -50,33 +50,22 @@ button:hover {
   z-index: 1;
 }
 
-/* ========== GUIDE HANDLE ========== */
+/* === GUIDE HANDLE & GUIDE LINE === */
 .guide-handle {
   position: absolute;
   z-index: 20;
   cursor: grab;
   pointer-events: auto;
-  width: 80px;
-  height: 96px;
-  transform: translate(-50%, -50%);
 }
 
-.cursor-img {
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Linee guida */
-.guide-handle.horizontal::before,
-.guide-handle.vertical::before {
+.guide-handle::before {
   content: "";
   position: absolute;
   background: currentColor;
   z-index: -1;
 }
 
+/* Linea orizzontale */
 .guide-handle.horizontal::before {
   top: 50%;
   left: 0;
@@ -84,6 +73,7 @@ button:hover {
   height: 2px;
 }
 
+/* Linea verticale */
 .guide-handle.vertical::before {
   top: 0;
   left: 50%;
@@ -91,15 +81,28 @@ button:hover {
   height: 100%;
 }
 
-/* ========== LINE COLORS ========== */
-.topOuter { color: #ff00ff; }
-.topInner { color: #ff69b4; }
-.bottomOuter { color: #ffaa00; }
-.bottomInner { color: #ffcc00; }
-.leftOuter { color: #ff4444; }
-.leftInner { color: #dd2222; }
-.rightOuter { color: #00ffff; }
-.rightInner { color: #00bfff; }
+/* === CURSORE PNG === */
+.cursor-img {
+  width: 80px;
+  height: 96px;
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+/* === COLORI DELLE LINEE === */
+.topOuter::before { background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px); }
+.topInner::before { background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px); }
+.bottomOuter::before { background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px); }
+.bottomInner::before { background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px); }
+
+.leftOuter::before { background: repeating-linear-gradient(to bottom, #ff4444 0 2px, transparent 2px 6px); }
+.leftInner::before { background: repeating-linear-gradient(to bottom, #dd2222 0 2px, transparent 2px 6px); }
+.rightOuter::before { background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px); }
+.rightInner::before { background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px); }
 
 /* ========== LAYOUT ========== */
 .container {
@@ -176,4 +179,3 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
-
