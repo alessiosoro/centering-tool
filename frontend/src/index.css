@@ -39,7 +39,6 @@ button:hover {
 .image-wrapper {
   position: relative;
   display: inline-block;
-  max-width: 100%;
 }
 
 .card-image {
@@ -53,7 +52,7 @@ button:hover {
 
 .guide-handle {
   position: absolute;
-  z-index: 2;
+  z-index: 10;
   cursor: grab;
   pointer-events: all;
 }
@@ -66,8 +65,9 @@ button:hover {
 
 /* Verticali */
 .guide-handle.vertical {
-  height: 100%;
   width: 2px;
+  top: 0;
+  bottom: 0;
 }
 
 /* ======= LINE COLORS + MANIGLIA ======= */
@@ -107,14 +107,11 @@ button:hover {
   border: 1px solid #000;
 }
 
-/* Posizione maniglie orizzontali */
 .horizontal::after {
   left: 50%;
   top: -6px;
   transform: translateX(-50%);
 }
-
-/* Posizione maniglie verticali */
 .vertical::after {
   top: 50%;
   left: -6px;
@@ -123,11 +120,11 @@ button:hover {
   transform: translateY(-50%);
 }
 
-/* Colori maniglia */
 .topOuter::after { background-color: #ff00ff; }
 .topInner::after { background-color: #ff69b4; }
 .bottomOuter::after { background-color: #ffaa00; }
 .bottomInner::after { background-color: #ffcc00; }
+
 .leftOuter::after { background-color: #ff4444; }
 .leftInner::after { background-color: #dd2222; }
 .rightOuter::after { background-color: #00ffff; }
