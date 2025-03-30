@@ -39,7 +39,6 @@ button:hover {
 .image-wrapper {
   position: relative;
   display: inline-block;
-  max-width: 100%;
 }
 
 .card-image {
@@ -47,34 +46,38 @@ button:hover {
   display: block;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  position: relative;
   z-index: 1;
 }
 
-/* Guide cliccabili */
+/* ===== Guide handles ===== */
 .guide-handle {
   position: absolute;
   z-index: 10;
   cursor: grab;
   pointer-events: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-/* Orizzontali */
 .guide-handle.horizontal {
   height: 2px;
   width: 100%;
 }
 
-/* Verticali */
 .guide-handle.vertical {
   width: 2px;
   height: 100%;
 }
 
-/* Linee guida con colori */
+/* ===== Cursor image (full clickable area) ===== */
+.cursor-img {
+  width: 80px;
+  height: 96px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ===== LINE COLORS ===== */
 .topOuter {
   background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
 }
@@ -98,26 +101,6 @@ button:hover {
 }
 .rightInner {
   background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
-}
-
-/* Immagine cursori */
-.cursor-img {
-  width: 80px;
-  height: 96px;
-  pointer-events: none;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  user-select: none;
-}
-
-/* Allineamento */
-.guide-handle.horizontal .cursor-img {
-  top: 50%;
-  left: 50%;
-}
-.guide-handle.vertical .cursor-img {
-  top: 50%;
-  left: 50%;
 }
 
 /* ========== LAYOUT ========== */
