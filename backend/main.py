@@ -26,17 +26,17 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    left = (g["leftInner"] - g["leftOuter"]) * w
-    right = (g["rightOuter"] - g["rightInner"]) * w
-    top = (g["topInner"] - g["topOuter"]) * h
-    bottom = (g["bottomOuter"] - g["bottomInner"]) * h
+    # ✅ Calcolo margini positivi
+    left = abs((g["leftInner"] - g["leftOuter"]) * w)
+    right = abs((g["rightOuter"] - g["rightInner"]) * w)
+    top = abs((g["topInner"] - g["topOuter"]) * h)
+    bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
 
     totalH = left + right
     totalV = top + bottom
 
     horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
     verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
-    global_centering = round((horPercent + verPercent) / 2, 1)
 
     def score(val, tol):
         dev = abs(val - 50)
@@ -51,11 +51,11 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         else:
             return 6
 
-    psa = score(global_centering, 5)
-    bgs = score(global_centering, 3)
-    sgc = score(global_centering, 6)
+    psa = score(horPercent, 5)
+    bgs = score(horPercent, 3)
+    sgc = score(horPercent, 6)
 
-    # Colori linee guida
+    # Colori delle linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -67,6 +67,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         "rightInner": "#00bfff",
     }
 
+    # 🖍️ Disegno le linee guida sull’immagine
     draw = ImageDraw.Draw(image)
     for key, val in g.items():
         if "top" in key or "bottom" in key:
@@ -76,10 +77,12 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
+    # 📸 Salva immagine con linee
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
+    # 🧾 Crea PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -88,7 +91,6 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     pdf.ln(10)
     text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
-Centratura Globale: {global_centering}%
 
 PSA: {psa}
 BGS: {bgs}
@@ -106,11 +108,11 @@ SGC: {sgc}"""
         "right": round(right, 2),
         "top": round(top, 2),
         "bottom": round(bottom, 2),
-        "global_centering": global_centering,
         "psa": psa,
         "bgs": bgs,
         "sgc": sgc,
         "pdf_base64": pdf_base64
     })
 
+# 🎯 Monta frontend React
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
