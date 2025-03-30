@@ -36,15 +36,20 @@ button:hover {
   margin: 0 auto;
 }
 
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .card-image {
   width: 100%;
   display: block;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  position: relative;
   z-index: 1;
 }
 
+/* Guide */
 .guide-handle {
   position: absolute;
   z-index: 10;
