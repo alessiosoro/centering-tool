@@ -8,6 +8,7 @@ import io
 import base64
 from fpdf import FPDF
 import json
+import os
 
 app = FastAPI()
 
@@ -53,8 +54,9 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
-    # 📸 Salva immagine temporanea
-    with open("temp_image.jpg", "wb") as temp_file:
+    # 📸 Salva immagine temporanea in /tmp
+    temp_path = "/tmp/temp_image.jpg"
+    with open(temp_path, "wb") as temp_file:
         temp_file.write(image_data)
 
     # 🧾 Crea PDF
@@ -72,10 +74,8 @@ BGS: {bgs}
 SGC: {sgc}"""
     pdf.multi_cell(0, 10, text)
 
-    # Inserisce immagine da file
-    pdf.image("temp_image.jpg", x=30, y=80, w=150)
+    pdf.image(temp_path, x=30, y=80, w=150)
 
-    # PDF in memoria
     pdf_output = io.BytesIO()
     pdf.output(pdf_output)
     pdf_output.seek(0)
