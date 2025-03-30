@@ -22,7 +22,6 @@ function ResultEvaluator({ image, guides }) {
         body: formData,
       });
       const data = await res.json();
-
       setResult(data);
 
       const pdfBlob = new Blob([Uint8Array.from(atob(data.pdf_base64), c => c.charCodeAt(0))], { type: 'application/pdf' });
@@ -38,8 +37,7 @@ function ResultEvaluator({ image, guides }) {
   return (
     <div className="results-section">
       <h2>📊 Analisi con FastAPI</h2>
-
-      <button onClick={handleAnalyze} className="analyze-button" disabled={loading}>
+      <button onClick={handleAnalyze} disabled={loading}>
         {loading ? "Analisi in corso..." : "🔍 Analizza la centratura"}
       </button>
 
