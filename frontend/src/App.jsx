@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ImageUploader from "./components/ImageUploader";
 import CanvasRenderer from "./components/CanvasRenderer";
-import ResultBox from "./components/ResultBox";
+import ResultEvaluator from './components/ResultEvaluator';
 import "./index.css";
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
 
           {result && (
             <div className="results-section">
-              <ResultBox result={result} />
+              <ResultEvaluator image={imagePreview} guides={guides} />
             </div>
           )}
         </div>
