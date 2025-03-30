@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import "./index.css";
+import "../index.css";
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
   const containerRef = useRef(null);
