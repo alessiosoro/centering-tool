@@ -11,9 +11,6 @@ import json
 
 app = FastAPI()
 
-# Serve React frontend
-app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -88,3 +85,6 @@ SGC: {sgc}"""
         "sgc": sgc,
         "pdf_base64": pdf_base64
     })
+
+# Monta React frontend SOLO alla fine!
+app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
