@@ -41,11 +41,13 @@ button:hover {
   display: block;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  position: relative;
+  z-index: 1;
 }
 
 .guide-handle {
   position: absolute;
-  z-index: 10;
+  z-index: 2;
   cursor: pointer;
   background-color: transparent;
 }
@@ -167,4 +169,3 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
-
