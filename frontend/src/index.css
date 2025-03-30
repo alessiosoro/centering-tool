@@ -1,3 +1,41 @@
+/* ========== BASE DARK THEME ========== */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 28px;
+  color: #f2f2f2;
+}
+
+button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #666;
+}
+
+/* ========== CANVAS + GUIDE STYLE ========== */
+.canvas-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
 .card-image {
   width: 100%;
   display: block;
@@ -9,7 +47,7 @@
 
 .guide-handle {
   position: absolute;
-  z-index: 10; /* 🔥 Sopra l'immagine */
+  z-index: 10;
   cursor: grab;
   background-color: transparent;
 }
@@ -54,4 +92,80 @@
 
 .rightInner {
   background: repeating-linear-gradient(to bottom, #2266ff 0 2px, transparent 2px 6px);
+}
+
+/* ========== LAYOUT ========== */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.image-section {
+  flex: 1 1 600px;
+  max-width: 600px;
+}
+
+.results-section {
+  flex: 1 1 300px;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.results-section h2 {
+  margin-top: 0;
+  color: #f0f0f0;
+}
+
+.result-box {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #3a3a3a;
+  border-radius: 8px;
+}
+
+.result-box span {
+  display: block;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #111;
+  color: #fff;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+/* ========== UPLOADER ========== */
+.uploader {
+  border: 2px dashed #666;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  color: #aaa;
+  background-color: #2a2a2a;
+  transition: border 0.3s;
+}
+
+.uploader.dragover {
+  border-color: #00bfff;
+  color: #fff;
+}
+
+.uploader input {
+  display: none;
+}
+
+.uploader-label {
+  font-size: 16px;
+  cursor: pointer;
 }
