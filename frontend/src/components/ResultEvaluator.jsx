@@ -20,7 +20,7 @@ const ResultEvaluator = ({ result }) => {
 
       <div className="result-box">
         <span className="badge">Centratura Globale</span>
-        <strong>{Math.round((result.hor_percent + result.ver_percent) / 2)}%</strong>
+        <strong>{result.global_percent}%</strong>
       </div>
 
       <div className="result-box">
