@@ -30,15 +30,16 @@ button:hover {
 
 /* ========== CANVAS + GUIDES ========== */
 .canvas-container {
-  position: relative;
-  display: inline-block;
-  max-width: 100%;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .image-wrapper {
   position: relative;
   display: inline-block;
+  max-width: 100%;
 }
 
 .card-image {
@@ -46,13 +47,13 @@ button:hover {
   display: block;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  position: relative;
   z-index: 1;
 }
 
-/* Guide */
 .guide-handle {
   position: absolute;
-  z-index: 10;
+  z-index: 2;
   cursor: grab;
   pointer-events: all;
 }
@@ -73,31 +74,24 @@ button:hover {
 .topOuter {
   background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
 }
-
 .topInner {
   background: repeating-linear-gradient(to right, #ff69b4 0 2px, transparent 2px 6px);
 }
-
 .bottomOuter {
   background: repeating-linear-gradient(to right, #ffaa00 0 2px, transparent 2px 6px);
 }
-
 .bottomInner {
   background: repeating-linear-gradient(to right, #ffcc00 0 2px, transparent 2px 6px);
 }
-
 .leftOuter {
   background: repeating-linear-gradient(to bottom, #ff4444 0 2px, transparent 2px 6px);
 }
-
 .leftInner {
   background: repeating-linear-gradient(to bottom, #dd2222 0 2px, transparent 2px 6px);
 }
-
 .rightOuter {
   background: repeating-linear-gradient(to bottom, #00ffff 0 2px, transparent 2px 6px);
 }
-
 .rightInner {
   background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
 }
@@ -113,14 +107,14 @@ button:hover {
   border: 1px solid #000;
 }
 
-/* Posizione per guide orizzontali */
+/* Posizione maniglie orizzontali */
 .horizontal::after {
   left: 50%;
   top: -6px;
   transform: translateX(-50%);
 }
 
-/* Posizione per guide verticali */
+/* Posizione maniglie verticali */
 .vertical::after {
   top: 50%;
   left: -6px;
@@ -134,7 +128,6 @@ button:hover {
 .topInner::after { background-color: #ff69b4; }
 .bottomOuter::after { background-color: #ffaa00; }
 .bottomInner::after { background-color: #ffcc00; }
-
 .leftOuter::after { background-color: #ff4444; }
 .leftInner::after { background-color: #dd2222; }
 .rightOuter::after { background-color: #00ffff; }
