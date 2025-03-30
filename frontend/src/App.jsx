@@ -49,11 +49,10 @@ function App() {
       const data = await res.json();
       setResult(data);
     } catch (error) {
-      console.error("Errore analisi live:", error);
+      console.error("Errore durante l'analisi:", error);
     }
   };
 
-  // 🔄 Ricalcola ogni volta che i cursori cambiano
   useEffect(() => {
     if (imageFile) {
       evaluateLive();
@@ -69,7 +68,11 @@ function App() {
       {imagePreview && (
         <div className="container">
           <div className="image-section">
-            <CanvasRenderer image={imagePreview} guides={guides} onGuideChange={handleGuideChange} />
+            <CanvasRenderer
+              image={imagePreview}
+              guides={guides}
+              onGuideChange={handleGuideChange}
+            />
             <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
               <button onClick={resetApp}>🔄 Carica nuova immagine</button>
             </div>
