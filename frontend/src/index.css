@@ -45,6 +45,7 @@ button:hover {
   z-index: 1;
 }
 
+/* Guide handles (drag points) */
 .guide-handle {
   position: absolute;
   z-index: 10;
@@ -75,16 +76,22 @@ button:hover {
   transform: translateY(-50%);
 }
 
-.guide-handle.horizontal {
+/* Correct positioning relative to image */
+.canvas-container .guide-handle.horizontal {
   width: 100%;
+  left: 0;
+  right: 0;
   height: 2px;
 }
 
-.guide-handle.vertical {
+.canvas-container .guide-handle.vertical {
   height: 100%;
+  top: 0;
+  bottom: 0;
   width: 2px;
 }
 
+/* Colored lines */
 .topOuter {
   background: repeating-linear-gradient(to right, #00ff00 0 2px, transparent 2px 6px);
 }
