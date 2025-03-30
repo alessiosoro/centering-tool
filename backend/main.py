@@ -2,13 +2,11 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Dict
 from PIL import Image
 import io
 import base64
 from fpdf import FPDF
 import json
-import os
 import tempfile
 
 app = FastAPI()
@@ -27,7 +25,6 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    # ✅ Usa valori assoluti per evitare percentuali negative
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -38,6 +35,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
 
     horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
     verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
+    centering_global = round((100 - abs(50 - horPercent) - abs(50 - verPercent)), 1)
 
     def score(val, tol):
         dev = abs(val - 50)
@@ -68,6 +66,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     pdf.ln(10)
     text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
+Centratura Globale: {centering_global}%
 
 PSA: {psa}
 BGS: {bgs}
@@ -88,6 +87,7 @@ SGC: {sgc}"""
         "psa": psa,
         "bgs": bgs,
         "sgc": sgc,
+        "centering_global": centering_global,
         "pdf_base64": pdf_base64
     })
 
