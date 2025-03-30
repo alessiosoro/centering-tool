@@ -45,7 +45,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         const isHorizontal = key.includes("top") || key.includes("bottom");
         const style = isHorizontal
           ? { top: `${val * 100}%` }
-          : { left: `${val * 100}%` };
+          : { left: `${val * 100}%`, height: '100%' }; // Imposta l'altezza a 100% rispetto all'immagine
 
         return (
           <div
