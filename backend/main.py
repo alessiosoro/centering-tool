@@ -9,6 +9,7 @@ import base64
 from fpdf import FPDF
 import json
 import os
+import tempfile
 
 app = FastAPI()
 
@@ -34,8 +35,8 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     totalH = left + right
     totalV = top + bottom
 
-    horPercent = round((left / totalH) * 1000) / 10
-    verPercent = round((top / totalV) * 1000) / 10
+    horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
+    verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
 
     def score(val, tol):
         dev = abs(val - 50)
@@ -54,11 +55,10 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
-    # ✅ Salva immagine come JPEG valido nella directory temporanea
-    temp_path = "/tmp/temp_image.jpg"
-    image.save(temp_path, format="JPEG")
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        temp_path = tmp.name
+        image.save(temp_path, format="JPEG")
 
-    # 🧾 Crea PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -72,11 +72,8 @@ PSA: {psa}
 BGS: {bgs}
 SGC: {sgc}"""
     pdf.multi_cell(0, 10, text)
-
-    # 📸 Inserisci immagine nel PDF
     pdf.image(temp_path, x=30, y=80, w=150)
 
-    # 📤 Esporta PDF come stringa e codifica in base64
     pdf_data = pdf.output(dest="S").encode("latin-1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
@@ -93,5 +90,5 @@ SGC: {sgc}"""
         "pdf_base64": pdf_base64
     })
 
-# 🎯 Monta il frontend React alla fine
+# 🎯 Serve il frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
