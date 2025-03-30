@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Dict
 from PIL import Image
 import io
@@ -9,6 +10,9 @@ from fpdf import FPDF
 import json
 
 app = FastAPI()
+
+# Serve React frontend
+app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
 
 app.add_middleware(
     CORSMiddleware,
