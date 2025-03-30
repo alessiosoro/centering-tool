@@ -54,7 +54,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
-    # ✅ Salva immagine come JPEG reale in cartella sicura
+    # ✅ Salva immagine come JPEG valido nella directory temporanea
     temp_path = "/tmp/temp_image.jpg"
     image.save(temp_path, format="JPEG")
 
@@ -73,14 +73,12 @@ BGS: {bgs}
 SGC: {sgc}"""
     pdf.multi_cell(0, 10, text)
 
-    # ✅ Inserisce immagine nel PDF
+    # 📸 Inserisci immagine nel PDF
     pdf.image(temp_path, x=30, y=80, w=150)
 
-    # 📤 Output PDF come base64
-    pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    pdf_base64 = base64.b64encode(pdf_output.read()).decode()
+    # 📤 Esporta PDF come stringa e codifica in base64
+    pdf_data = pdf.output(dest="S").encode("latin-1")
+    pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
         "hor_percent": horPercent,
@@ -95,5 +93,5 @@ SGC: {sgc}"""
         "pdf_base64": pdf_base64
     })
 
-# 🖼️ Monta l’interfaccia React buildata
+# 🎯 Monta il frontend React alla fine
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
