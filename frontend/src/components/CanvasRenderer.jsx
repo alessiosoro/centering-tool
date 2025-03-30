@@ -77,11 +77,11 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
           const style = isHorizontal
             ? {
-                top: `${val * 100}%`,
+                "--y": val,
                 left: `calc(50% + ${cursorOffset[key]}px)`,
               }
             : {
-                left: `${val * 100}%`,
+                "--x": val,
                 top: `calc(50% + ${cursorOffset[key]}px)`,
               };
 
