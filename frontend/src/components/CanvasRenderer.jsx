@@ -1,5 +1,7 @@
+// src/components/CanvasRenderer.jsx
 import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
+
 import up_up from "../assets/up_up.png";
 import up_down from "../assets/up_down.png";
 import down_up from "../assets/down_up.png";
@@ -18,17 +20,6 @@ const cursorImages = {
   leftInner: left_left,
   rightOuter: right_left,
   rightInner: right_right,
-};
-
-const cursorOffset = {
-  topOuter: -40,
-  topInner: 40,
-  bottomOuter: -40,
-  bottomInner: 40,
-  leftOuter: -40,
-  leftInner: 40,
-  rightOuter: -40,
-  rightInner: 40,
 };
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
@@ -72,48 +63,36 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
-        <div className="guide-layer">
-          {Object.entries(guides).map(([key, val]) => {
-            const isHorizontal = key.includes("top") || key.includes("bottom");
-            const style = isHorizontal
-              ? { top: `${val * 100}%` }
-              : { left: `${val * 100}%` };
+        {Object.entries(guides).map(([key, val]) => {
+          const isHorizontal = key.includes("top") || key.includes("bottom");
+          const style = isHorizontal
+            ? {
+                top: `${val * 100}%`,
+                left: `0`,
+                right: `0`,
+              }
+            : {
+                top: `0`,
+                bottom: `0`,
+                left: `${val * 100}%`,
+              };
 
-            const cursor = cursorImages[key];
-            const offset = cursorOffset[key];
-
-            return (
-              <div
-                key={key}
-                className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"} ${key}`}
-                style={style}
-                onMouseDown={(e) => handleMouseDown(e, key)}
-              >
-                <img
-                  src={cursor}
-                  alt="cursor"
-                  className="cursor-img"
-                  style={
-                    isHorizontal
-                      ? {
-                          top: offset,
-                          position: "absolute",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                        }
-                      : {
-                          left: offset,
-                          position: "absolute",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                        }
-                  }
-                  draggable={false}
-                />
-              </div>
-            );
-          })}
-        </div>
+          return (
+            <div
+              key={key}
+              className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"} ${key}`}
+              style={style}
+              onMouseDown={(e) => handleMouseDown(e, key)}
+            >
+              <img
+                src={cursorImages[key]}
+                alt={key}
+                className="cursor-img"
+                draggable={false}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
