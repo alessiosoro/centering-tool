@@ -20,6 +20,17 @@ const cursorImages = {
   rightInner: right_right,
 };
 
+const offsetMap = {
+  topOuter: -24,
+  topInner: +8,
+  bottomOuter: -24,
+  bottomInner: +8,
+  leftOuter: -24,
+  leftInner: +8,
+  rightOuter: -24,
+  rightInner: +8,
+};
+
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
   const wrapperRef = useRef();
   const imageRef = useRef();
@@ -57,16 +68,6 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     };
   }, [dragging]);
 
-  // Offset dei cursori gemelli per evitare sovrapposizione
-  const getOffset = (key) => {
-    const offset = 20; // pixel
-    if (key.includes("top") || key.includes("bottom")) {
-      return key.includes("Inner") ? { left: "10px" } : { left: "-10px" };
-    } else {
-      return key.includes("Inner") ? { top: "10px" } : { top: "-10px" };
-    }
-  };
-
   return (
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
@@ -74,9 +75,19 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
           const cursor = cursorImages[key];
+          const offset = offsetMap[key] || 0;
+
           const style = isHorizontal
-            ? { top: `${val * 100}%` }
-            : { left: `${val * 100}%` };
+            ? {
+                top: `${val * 100}%`,
+                left: `calc(50% + ${offset}px)`,
+                transform: "translate(-50%, -50%)",
+              }
+            : {
+                left: `${val * 100}%`,
+                top: `calc(50% + ${offset}px)`,
+                transform: "translate(-50%, -50%)",
+              };
 
           return (
             <div
@@ -87,10 +98,9 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
             >
               <img
                 src={cursor}
-                alt="cursor"
-                draggable={false}
+                alt={`cursor-${key}`}
                 className="cursor-img"
-                style={getOffset(key)} // ➕ offset per evitare overlap
+                draggable={false}
               />
             </div>
           );
