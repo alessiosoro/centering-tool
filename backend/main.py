@@ -27,10 +27,11 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    left = (g["leftInner"] - g["leftOuter"]) * w
-    right = (g["rightOuter"] - g["rightInner"]) * w
-    top = (g["topInner"] - g["topOuter"]) * h
-    bottom = (g["bottomOuter"] - g["bottomInner"]) * h
+    # ✅ Usa valori assoluti per evitare percentuali negative
+    left = abs((g["leftInner"] - g["leftOuter"]) * w)
+    right = abs((g["rightOuter"] - g["rightInner"]) * w)
+    top = abs((g["topInner"] - g["topOuter"]) * h)
+    bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
 
     totalH = left + right
     totalV = top + bottom
@@ -90,5 +91,4 @@ SGC: {sgc}"""
         "pdf_base64": pdf_base64
     })
 
-# 🎯 Serve il frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
