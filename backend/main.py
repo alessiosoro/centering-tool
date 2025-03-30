@@ -2,7 +2,8 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from PIL import Image
+from typing import Dict
+from PIL import Image, ImageDraw
 import io
 import base64
 from fpdf import FPDF
@@ -25,17 +26,16 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    left = abs((g["leftInner"] - g["leftOuter"]) * w)
-    right = abs((g["rightOuter"] - g["rightInner"]) * w)
-    top = abs((g["topInner"] - g["topOuter"]) * h)
-    bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
+    left = (g["leftInner"] - g["leftOuter"]) * w
+    right = (g["rightOuter"] - g["rightInner"]) * w
+    top = (g["topInner"] - g["topOuter"]) * h
+    bottom = (g["bottomOuter"] - g["bottomInner"]) * h
 
     totalH = left + right
     totalV = top + bottom
 
     horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
     verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
-    centering_global = round((100 - abs(50 - horPercent) - abs(50 - verPercent)), 1)
 
     def score(val, tol):
         dev = abs(val - 50)
@@ -54,10 +54,34 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(horPercent, 3)
     sgc = score(horPercent, 6)
 
+    # Colori delle linee guida
+    colors = {
+        "topOuter": "#ff00ff",
+        "topInner": "#ff69b4",
+        "bottomOuter": "#ffaa00",
+        "bottomInner": "#ffcc00",
+        "leftOuter": "#ff4444",
+        "leftInner": "#dd2222",
+        "rightOuter": "#00ffff",
+        "rightInner": "#00bfff",
+    }
+
+    # Disegno le linee guida sull'immagine
+    draw = ImageDraw.Draw(image)
+    for key, val in g.items():
+        if "top" in key or "bottom" in key:
+            y = int(h * val)
+            draw.line([(0, y), (w, y)], fill=colors.get(key, "#ffffff"), width=2)
+        else:
+            x = int(w * val)
+            draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
+
+    # Salvo immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
+    # Creo PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -66,7 +90,6 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     pdf.ln(10)
     text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
-Centratura Globale: {centering_global}%
 
 PSA: {psa}
 BGS: {bgs}
@@ -87,8 +110,8 @@ SGC: {sgc}"""
         "psa": psa,
         "bgs": bgs,
         "sgc": sgc,
-        "centering_global": centering_global,
         "pdf_base64": pdf_base64
     })
 
+# Monta frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
