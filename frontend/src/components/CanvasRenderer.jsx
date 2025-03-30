@@ -57,17 +57,26 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     };
   }, [dragging]);
 
+  // Offset dei cursori gemelli per evitare sovrapposizione
+  const getOffset = (key) => {
+    const offset = 20; // pixel
+    if (key.includes("top") || key.includes("bottom")) {
+      return key.includes("Inner") ? { left: "10px" } : { left: "-10px" };
+    } else {
+      return key.includes("Inner") ? { top: "10px" } : { top: "-10px" };
+    }
+  };
+
   return (
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
+          const cursor = cursorImages[key];
           const style = isHorizontal
             ? { top: `${val * 100}%` }
             : { left: `${val * 100}%` };
-
-          const cursor = cursorImages[key];
 
           return (
             <div
@@ -81,6 +90,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
                 alt="cursor"
                 draggable={false}
                 className="cursor-img"
+                style={getOffset(key)} // ➕ offset per evitare overlap
               />
             </div>
           );
