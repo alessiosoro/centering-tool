@@ -20,16 +20,16 @@ const cursorImages = {
   rightInner: right_right,
 };
 
-// Offset per evitare sovrapposizione (106px)
-const cursorOffset = {
-  topOuter: -53,
-  topInner: 53,
-  bottomOuter: -53,
-  bottomInner: 53,
-  leftOuter: -53,
-  leftInner: 53,
-  rightOuter: -53,
-  rightInner: 53,
+// Offset per sfalsamento visivo (non per clic)
+const visualOffset = {
+  topOuter: -48,
+  topInner: 48,
+  bottomOuter: -48,
+  bottomInner: 48,
+  leftOuter: -48,
+  leftInner: 48,
+  rightOuter: -48,
+  rightInner: 48,
 };
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
@@ -42,7 +42,9 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     setDragging({ key });
   };
 
-  const handleMouseUp = () => setDragging(null);
+  const handleMouseUp = () => {
+    setDragging(null);
+  };
 
   const handleMouseMove = (e) => {
     if (!dragging || !imageRef.current) return;
@@ -76,18 +78,12 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
           const style = isHorizontal
             ? {
                 top: `${val * 100}%`,
-                left: "0",
-                width: "100%",
+                left: `calc(50% + ${visualOffset[key]}px)`
               }
             : {
                 left: `${val * 100}%`,
-                top: "0",
-                height: "100%",
+                top: `calc(50% + ${visualOffset[key]}px)`
               };
-
-          const offsetStyle = isHorizontal
-            ? { left: `calc(50% + ${cursorOffset[key]}px)` }
-            : { top: `calc(50% + ${cursorOffset[key]}px)` };
 
           const cursor = cursorImages[key];
 
@@ -100,9 +96,8 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
             >
               <img
                 src={cursor}
-                alt={key}
+                alt="cursor"
                 className="cursor-img"
-                style={offsetStyle}
                 draggable={false}
               />
             </div>
