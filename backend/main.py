@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from typing import Dict
 from PIL import Image, ImageDraw
 import io
 import base64
@@ -25,18 +26,17 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     w, h = image.size
     g = json.loads(guides)
 
-    # ✅ Calcolo distanze assolute
-    left = abs((g["leftInner"] - g["leftOuter"]) * w)
-    right = abs((g["rightOuter"] - g["rightInner"]) * w)
-    top = abs((g["topInner"] - g["topOuter"]) * h)
-    bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
+    left = (g["leftInner"] - g["leftOuter"]) * w
+    right = (g["rightOuter"] - g["rightInner"]) * w
+    top = (g["topInner"] - g["topOuter"]) * h
+    bottom = (g["bottomOuter"] - g["bottomInner"]) * h
 
-    totalH = left + right if (left + right) != 0 else 1
-    totalV = top + bottom if (top + bottom) != 0 else 1
+    totalH = left + right
+    totalV = top + bottom
 
-    horPercent = round((left / totalH) * 1000) / 10
-    verPercent = round((top / totalV) * 1000) / 10
-    globalPercent = round(((horPercent + verPercent) / 2) * 10) / 10
+    horPercent = round((left / totalH) * 1000) / 10 if totalH != 0 else 0
+    verPercent = round((top / totalV) * 1000) / 10 if totalV != 0 else 0
+    global_centering = round((horPercent + verPercent) / 2, 1)
 
     def score(val, tol):
         dev = abs(val - 50)
@@ -51,9 +51,9 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         else:
             return 6
 
-    psa = score(horPercent, 5)
-    bgs = score(horPercent, 3)
-    sgc = score(horPercent, 6)
+    psa = score(global_centering, 5)
+    bgs = score(global_centering, 3)
+    sgc = score(global_centering, 6)
 
     # Colori linee guida
     colors = {
@@ -76,12 +76,10 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # Immagine temporanea per PDF
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # 📄 PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
@@ -90,7 +88,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     pdf.ln(10)
     text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
-Centratura Globale: {globalPercent}%
+Centratura Globale: {global_centering}%
 
 PSA: {psa}
 BGS: {bgs}
@@ -108,12 +106,11 @@ SGC: {sgc}"""
         "right": round(right, 2),
         "top": round(top, 2),
         "bottom": round(bottom, 2),
-        "global_percent": globalPercent,
+        "global_centering": global_centering,
         "psa": psa,
         "bgs": bgs,
         "sgc": sgc,
         "pdf_base64": pdf_base64
     })
 
-# Frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
