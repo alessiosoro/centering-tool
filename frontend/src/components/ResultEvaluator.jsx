@@ -2,6 +2,8 @@ import React from "react";
 import "../index.css";
 
 const ResultEvaluator = ({ result }) => {
+  const global = Math.round(((result.hor_percent + result.ver_percent) / 2) * 10) / 10;
+
   return (
     <div>
       <h2>Risultati</h2>
@@ -20,7 +22,7 @@ const ResultEvaluator = ({ result }) => {
 
       <div className="result-box">
         <span className="badge">Centratura Globale</span>
-        <strong>{result.global_centering}%</strong>
+        <strong>{global}%</strong>
       </div>
 
       <div className="result-box">
