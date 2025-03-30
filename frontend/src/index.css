@@ -39,6 +39,7 @@ button:hover {
 .image-wrapper {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 .card-image {
@@ -50,6 +51,7 @@ button:hover {
   z-index: 1;
 }
 
+/* === LINEE === */
 .guide-handle {
   position: absolute;
   z-index: 10;
@@ -65,12 +67,11 @@ button:hover {
 
 /* Verticali */
 .guide-handle.vertical {
+  height: 100%;
   width: 2px;
-  top: 0;
-  bottom: 0;
 }
 
-/* ======= LINE COLORS + MANIGLIA ======= */
+/* ======= LINE COLORS ======= */
 .topOuter {
   background: repeating-linear-gradient(to right, #ff00ff 0 2px, transparent 2px 6px);
 }
@@ -96,39 +97,25 @@ button:hover {
   background: repeating-linear-gradient(to bottom, #00bfff 0 2px, transparent 2px 6px);
 }
 
-/* ======= MANIGLIE STILE CARTA ======= */
-.guide-handle::after {
-  content: "";
+/* ======= MANIGLIE IMMAGINE ======= */
+.guide-handle img.cursor-image {
   position: absolute;
-  background-color: currentColor;
-  width: 14px;
-  height: 4px;
-  border-radius: 2px;
-  border: 1px solid #000;
+  width: 40px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
-.horizontal::after {
+/* Posizionamento maniglie */
+.guide-handle.horizontal img.cursor-image {
+  top: 0;
   left: 50%;
-  top: -6px;
-  transform: translateX(-50%);
 }
-.vertical::after {
+
+.guide-handle.vertical img.cursor-image {
   top: 50%;
-  left: -6px;
-  width: 4px;
-  height: 14px;
-  transform: translateY(-50%);
+  left: 0;
 }
-
-.topOuter::after { background-color: #ff00ff; }
-.topInner::after { background-color: #ff69b4; }
-.bottomOuter::after { background-color: #ffaa00; }
-.bottomInner::after { background-color: #ffcc00; }
-
-.leftOuter::after { background-color: #ff4444; }
-.leftInner::after { background-color: #dd2222; }
-.rightOuter::after { background-color: #00ffff; }
-.rightInner::after { background-color: #00bfff; }
 
 /* ========== LAYOUT ========== */
 .container {
