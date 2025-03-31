@@ -216,3 +216,4 @@ async def evaluate(
 
 # Static frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
+
