@@ -38,3 +38,4 @@ backend/fonts/DejaVuSans.ttf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/NotoSansCJKjp-Regular.otf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/NotoSansCJKkr-Regular.otf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/NotoSansCJKsc-Regular.otf filter=lfs diff=lfs merge=lfs -text
+backend/fonts/NotoSansCJKtc-Regular.otf filter=lfs diff=lfs merge=lfs -text
