@@ -66,15 +66,15 @@ function App() {
   }, [guides]);
 
   const languages = [
-    { code: "it", flag: "🇮🇹" },
-    { code: "en", flag: "🇬🇧" },
-    { code: "fr", flag: "🇫🇷" },
-    { code: "de", flag: "🇩🇪" },
-    { code: "es", flag: "🇪🇸" },
-    { code: "pt", flag: "🇵🇹" },
-    { code: "zh", flag: "🇨🇳" },
-    { code: "ko", flag: "🇰🇷" },
-    { code: "ja", flag: "🇯🇵" },
+    { code: "it", flag: "it" },
+    { code: "en", flag: "gb" },
+    { code: "fr", flag: "fr" },
+    { code: "de", flag: "de" },
+    { code: "es", flag: "es" },
+    { code: "pt", flag: "pt" },
+    { code: "zh", flag: "cn" },
+    { code: "ko", flag: "kr" },
+    { code: "ja", flag: "jp" },
   ];
 
   const handleLanguageChange = (code) => {
@@ -99,7 +99,7 @@ function App() {
               title={lang.code.toUpperCase()}
             >
               <img
-                src={`https://flagcdn.com/24x18/${lang.code}.png`}
+                src={`https://flagcdn.com/24x18/${lang.flag}.png`}
                 alt={lang.code}
                 className="flag-icon"
               />
