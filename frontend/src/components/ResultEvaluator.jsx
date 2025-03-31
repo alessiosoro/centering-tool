@@ -5,12 +5,12 @@ const ResultEvaluator = ({ result }) => {
   const legenda = [
     { color: "#ff69b4", label: "Bordo Superiore Interno" },
     { color: "#ff00ff", label: "Bordo Superiore Esterno" },
-    { color: "#ffcc00", label: "Bordo Inferiore Interno" },
-    { color: "#ffaa00", label: "Bordo Inferiore Esterno" },
+    { color: "#ffaa00", label: "Bordo Inferiore Interno" },
+    { color: "#ffcc00", label: "Bordo Inferiore Esterno" },
     { color: "#dd2222", label: "Bordo Sinistro Interno" },
     { color: "#ff4444", label: "Bordo Sinistro Esterno" },
-    { color: "#00bfff", label: "Bordo Destro Interno" },
-    { color: "#00ffff", label: "Bordo Destro Esterno" },
+    { color: "#00ffff", label: "Bordo Destro Interno" },
+    { color: "#00bfff", label: "Bordo Destro Esterno" },
   ];
 
   return (
