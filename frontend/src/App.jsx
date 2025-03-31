@@ -31,19 +31,27 @@ function App() {
     setImageFile(file);
     setImagePreview(preview);
     setResult(null);
+    // Esegui subito l'analisi iniziale con lingua corrente
+    setTimeout(() => {
+      evaluateLive(file, guides, language);
+    }, 100);
   };
 
   const resetApp = () => {
     window.location.reload();
   };
 
-  const evaluateLive = async () => {
-    if (!imageFile) return;
+  const evaluateLive = async (
+    currentFile = imageFile,
+    currentGuides = guides,
+    currentLang = language
+  ) => {
+    if (!currentFile) return;
 
     const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("guides", JSON.stringify(guides));
-    formData.append("lang", language);
+    formData.append("file", currentFile);
+    formData.append("guides", JSON.stringify(currentGuides));
+    formData.append("lang", currentLang);
 
     try {
       const res = await fetch("/evaluate", {
@@ -60,10 +68,15 @@ function App() {
 
   useEffect(() => {
     if (imageFile) {
-      evaluateLive();
+      evaluateLive(imageFile, guides, language);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guides]);
+
+  useEffect(() => {
+    if (imageFile) {
+      evaluateLive(imageFile, guides, language);
+    }
+  }, [language]);
 
   const languages = [
     { code: "it", flag: "it" },
@@ -79,9 +92,6 @@ function App() {
 
   const handleLanguageChange = (code) => {
     setLanguage(code);
-    setTimeout(() => {
-      if (imageFile) evaluateLive();
-    }, 50);
   };
 
   return (
