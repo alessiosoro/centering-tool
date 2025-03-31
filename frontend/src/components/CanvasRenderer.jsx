@@ -45,13 +45,19 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
           const guideStyle = {
-            position: "absolute",
-            zIndex: 5,
-            backgroundColor: `var(--${key})`,
-            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
-            width: isHorizontal ? "100%" : "2px",
-            height: isHorizontal ? "2px" : "100%",
-          };
+  position: "absolute",
+  zIndex: 5,
+  backgroundColor: `var(--${key})`,
+  [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+  width: isHorizontal ? "100%" : "2px",
+  height: isHorizontal
+    ? "2px"
+    : imageRef.current
+    ? `${imageRef.current.offsetHeight}px`
+    : "100%",
+  top: isHorizontal ? `${val * 100}%` : "0",
+};
+
 
           const handleStyle = {
             position: "absolute",
