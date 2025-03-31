@@ -130,7 +130,7 @@ async def evaluate(
         pdf.image(temp_path, x=x_img, y=100, w=150)
 
         # Encode base64
-        pdf_data = pdf.output(dest="S").encode("latin1")
+        pdf_data = pdf.output(dest="S").encode("utf-8")
         pdf_base64 = base64.b64encode(pdf_data).decode()
 
         return JSONResponse(content={
