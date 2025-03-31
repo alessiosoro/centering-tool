@@ -27,6 +27,13 @@ const translations = {
     topOuter: "Bordo superiore esterno",
     bottomInner: "Bordo inferiore interno",
     bottomOuter: "Bordo inferiore esterno",
+    disclaimerTitle: "⚠️ Disclaimer",
+    disclaimerParagraphs: [
+      "⚠️ Questa è un'applicazione amatoriale.",
+      "🎓 È pensata per fornire un'idea preliminare della centratura di una carta.",
+      "❌ I risultati e i voti ipotetici non sono ufficiali né garantiscono il voto reale.",
+      "🧪 Usala come pre-analisi, ma affidati a una valutazione professionale per il grading."
+    ]
   },
   en: {
     title: "Centering Tool",
@@ -56,6 +63,13 @@ const translations = {
     topOuter: "Top Outer Border",
     bottomInner: "Bottom Inner Border",
     bottomOuter: "Bottom Outer Border",
+    disclaimerTitle: "⚠️ Disclaimer",
+    disclaimerParagraphs: [
+      "⚠️ This is a non-official hobby application.",
+      "🎓 It is intended to provide a preliminary idea of card centering.",
+      "❌ Results and grades shown are not official and not guaranteed.",
+      "🧪 Use it as a pre-analysis tool, but rely on professional grading for certification."
+    ]
   },
   fr: {
     title: "Outil de Centrage",
@@ -85,6 +99,13 @@ const translations = {
     topOuter: "Bord supérieur extérieur",
     bottomInner: "Bord inférieur intérieur",
     bottomOuter: "Bord inférieur extérieur",
+    disclaimerTitle: "⚠️ Avertissement",
+    disclaimerParagraphs: [
+      "⚠️ Ceci est une application amateur.",
+      "🎓 Elle est destinée à fournir une idée préliminaire du centrage d'une carte.",
+      "❌ Les résultats et notes ne sont pas officiels ni garantis.",
+      "🧪 Utilisez-la comme outil préliminaire, mais faites appel à un service de notation professionnel."
+    ]
   },
   de: {
     title: "Zentrierungs-Tool",
@@ -114,6 +135,13 @@ const translations = {
     topOuter: "Oberer Außenrand",
     bottomInner: "Unterer Innenrand",
     bottomOuter: "Unterer Außenrand",
+    disclaimerTitle: "⚠️ Haftungsausschluss",
+    disclaimerParagraphs: [
+      "⚠️ Dies ist eine inoffizielle Hobby-Anwendung.",
+      "🎓 Sie soll eine erste Einschätzung der Karten-Zentrierung ermöglichen.",
+      "❌ Die angezeigten Ergebnisse sind nicht offiziell und nicht garantiert.",
+      "🧪 Nutzen Sie das Tool zur Vorabprüfung, aber verlassen Sie sich auf professionelle Bewertung."
+    ]
   },
   es: {
     title: "Herramienta de Centración",
@@ -143,6 +171,13 @@ const translations = {
     topOuter: "Borde superior externo",
     bottomInner: "Borde inferior interno",
     bottomOuter: "Borde inferior externo",
+    disclaimerTitle: "⚠️ Descargo de responsabilidad",
+    disclaimerParagraphs: [
+      "⚠️ Esta es una aplicación no oficial de aficionados.",
+      "🎓 Su propósito es dar una idea preliminar del centrado de una carta.",
+      "❌ Los resultados y calificaciones no son oficiales ni garantizados.",
+      "🧪 Úsala como herramienta previa, pero confía en una evaluación profesional para el grading."
+    ]
   },
   pt: {
     title: "Ferramenta de Centralização",
@@ -172,6 +207,13 @@ const translations = {
     topOuter: "Borda superior externa",
     bottomInner: "Borda inferior interna",
     bottomOuter: "Borda inferior externa",
+    disclaimerTitle: "⚠️ Aviso Legal",
+    disclaimerParagraphs: [
+      "⚠️ Este é um aplicativo amador não oficial.",
+      "🎓 Ele serve para dar uma ideia inicial da centralização do cartão.",
+      "❌ Os resultados e notas não são oficiais nem garantidos.",
+      "🧪 Use como pré-análise, mas conte com uma avaliação profissional para o grading."
+    ]
   },
   zh: {
     title: "居中工具",
@@ -201,6 +243,13 @@ const translations = {
     topOuter: "上外边",
     bottomInner: "下内边",
     bottomOuter: "下外边",
+    disclaimerTitle: "⚠️ 免责声明",
+    disclaimerParagraphs: [
+      "⚠️ 本应用为非官方的业余工具。",
+      "🎓 仅用于初步评估卡片的居中情况。",
+      "❌ 显示的结果和评分不具有官方效力，也无法保证。",
+      "🧪 请作为预分析参考，正式评分应依赖专业机构。"
+    ]
   },
   ko: {
     title: "중심 정렬 도구",
@@ -230,6 +279,13 @@ const translations = {
     topOuter: "상단 외부 테두리",
     bottomInner: "하단 내부 테두리",
     bottomOuter: "하단 외부 테두리",
+    disclaimerTitle: "⚠️ 면책 조항",
+    disclaimerParagraphs: [
+      "⚠️ 이 앱은 비공식적인 취미용 도구입니다.",
+      "🎓 카드 중심 정렬을 미리 파악하기 위한 용도로 제공됩니다.",
+      "❌ 표시된 결과와 등급은 공식적인 것이 아니며 보장되지 않습니다.",
+      "🧪 정식 평가를 위해서는 전문가의 그레이딩을 이용하세요."
+    ]
   },
   ja: {
     title: "センタリングツール",
@@ -259,6 +315,13 @@ const translations = {
     topOuter: "上外側の枠",
     bottomInner: "下内側の枠",
     bottomOuter: "下外側の枠",
+    disclaimerTitle: "⚠️ 免責事項",
+    disclaimerParagraphs: [
+      "⚠️ このアプリは非公式の趣味ツールです。",
+      "🎓 カードのセンタリングを事前に確認するためのものです。",
+      "❌ 表示された結果や評価は公式なものではなく、保証されません。",
+      "🧪 正式な評価には専門のグレーディングサービスを利用してください。"
+    ]
   },
 };
 
