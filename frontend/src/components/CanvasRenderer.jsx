@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
 
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
+  const wrapperRef = useRef();
   const imageRef = useRef();
   const [dragging, setDragging] = useState(null);
 
@@ -19,9 +20,12 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     const key = dragging.key;
     const isHorizontal = key.includes("top") || key.includes("bottom");
 
-    const pos = isHorizontal
-      ? (e.clientY - rect.top) / rect.height
-      : (e.clientX - rect.left) / rect.width;
+    let pos;
+    if (isHorizontal) {
+      pos = (e.clientY - rect.top) / rect.height;
+    } else {
+      pos = (e.clientX - rect.left) / rect.width;
+    }
 
     const clamped = Math.max(0, Math.min(1, pos));
     onGuideChange(key, clamped);
@@ -38,43 +42,41 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 
   return (
     <div className="canvas-container">
-      <div className="image-wrapper">
+      <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
-
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-
-          const guideStyle = {
+          const lineStyle = {
             position: "absolute",
-            backgroundColor: `var(--${key})`,
             [isHorizontal ? "top" : "left"]: `${val * 100}%`,
             width: isHorizontal ? "100%" : "2px",
             height: isHorizontal ? "2px" : "100%",
+            backgroundColor: `var(--${key})`,
             zIndex: 5,
           };
 
           const handleStyle = {
             position: "absolute",
-            cursor: "grab",
             width: "20px",
             height: "20px",
             backgroundColor: `var(--${key})`,
-            border: "2px solid #fff",
             borderRadius: "4px",
-            transform: "translate(-50%, -50%)",
-            [isHorizontal ? "left" : "top"]: "50%",
-            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+            border: "2px solid white",
+            cursor: "grab",
             zIndex: 10,
+            transform: "translate(-50%, -50%)",
+            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+            [isHorizontal ? "left" : "top"]: "50%",
           };
 
           return (
             <React.Fragment key={key}>
-              <div className={`guide-line ${key}`} style={guideStyle}></div>
+              <div className="guide-line" style={lineStyle}></div>
               <div
-                className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"}`}
+                className="guide-handle"
                 style={handleStyle}
                 onMouseDown={(e) => handleMouseDown(e, key)}
-              />
+              ></div>
             </React.Fragment>
           );
         })}
