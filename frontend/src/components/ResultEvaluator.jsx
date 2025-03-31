@@ -60,7 +60,7 @@ const ResultEvaluator = ({ result, translations }) => {
       )}
 
       <div className="legend">
-        <h3>🎨 {t.resultTitle} - {t.languageLabel}</h3>
+        <h3>🎨 {t.resultTitle}</h3>
         <ul>
           {legenda.map((item, idx) => (
             <li key={idx}>
