@@ -142,3 +142,74 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
+
+.results-section {
+  flex: 0 0 280px;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.results-section h2 {
+  margin-top: 0;
+  color: #f0f0f0;
+  font-size: 20px;
+}
+
+.result-box {
+  margin-bottom: 12px;
+  padding: 8px;
+  background-color: #3a3a3a;
+  border-radius: 8px;
+}
+
+.result-box span {
+  display: block;
+  font-size: 15px;
+  color: #ccc;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #111;
+  color: #fff;
+  margin-right: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Legenda */
+.legend {
+  margin-top: 20px;
+}
+
+.legend h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #f2f2f2;
+}
+
+.legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.color-box {
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border-radius: 2px;
+  border: 1px solid #fff;
+}
