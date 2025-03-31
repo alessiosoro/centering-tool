@@ -43,6 +43,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", imageFile);
     formData.append("guides", JSON.stringify(guides));
+    formData.append("lang", language); // ✅ Invio lingua corrente
 
     try {
       const res = await fetch("/evaluate", {
@@ -61,7 +62,8 @@ function App() {
     if (imageFile) {
       evaluateLive();
     }
-  }, [guides]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guides, language]);
 
   const languages = [
     { code: "it", flag: "🇮🇹" },
