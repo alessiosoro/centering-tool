@@ -1,17 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "../index.css";
 
-const cursorOffset = {
-  topOuter: -20,
-  topInner: 20,
-  bottomOuter: -20,
-  bottomInner: 20,
-  leftOuter: -20,
-  leftInner: 20,
-  rightOuter: -20,
-  rightInner: 20,
-};
-
 const CanvasRenderer = ({ image, guides, onGuideChange }) => {
   const wrapperRef = useRef();
   const imageRef = useRef();
@@ -55,25 +44,42 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-          const style = isHorizontal
-            ? {
-                top: `${val * 100}%`,
-                left: `calc(50% + ${cursorOffset[key]}px)`,
-              }
-            : {
-                left: `${val * 100}%`,
-                top: `calc(50% + ${cursorOffset[key]}px)`,
-              };
+
+          const baseStyle = {
+            position: "absolute",
+            zIndex: 10,
+            width: isHorizontal ? "100%" : "2px",
+            height: isHorizontal ? "2px" : "100%",
+            backgroundColor: "transparent",
+          };
+
+          const guideLineStyle = {
+            ...baseStyle,
+            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+          };
+
+          const handleStyle = {
+            position: "absolute",
+            width: "20px",
+            height: "20px",
+            backgroundColor: `var(--${key})`,
+            borderRadius: "4px",
+            zIndex: 20,
+            cursor: "grab",
+            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+            [isHorizontal ? "left" : "top"]: "50%",
+            transform: "translate(-50%, -50%)",
+          };
 
           return (
-            <div
-              key={key}
-              className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"} ${key}`}
-              style={style}
-              onMouseDown={(e) => handleMouseDown(e, key)}
-            >
-              <div className="square-cursor" />
-            </div>
+            <React.Fragment key={key}>
+              <div className={`guide-line ${key}`} style={guideLineStyle}></div>
+              <div
+                className={`guide-handle ${key}`}
+                style={handleStyle}
+                onMouseDown={(e) => handleMouseDown(e, key)}
+              ></div>
+            </React.Fragment>
           );
         })}
       </div>
