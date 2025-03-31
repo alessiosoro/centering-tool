@@ -213,3 +213,46 @@ button:hover {
   border-radius: 2px;
   border: 1px solid #fff;
 }
+
+/* Tabs */
+.tabs-container {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  background-color: #2a2a2a;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.tab-buttons button {
+  background-color: #444;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tab-buttons button.active,
+.tab-buttons button:hover {
+  background-color: #666;
+}
+
+.tab-content {
+  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.tab-panel p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
