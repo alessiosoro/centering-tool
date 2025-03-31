@@ -13,71 +13,12 @@ import os
 
 app = FastAPI()
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Traduzioni per PDF
-translations = {
-    "it": {
-        "title": "RISULTATI CENTERING",
-        "horizontal": "Orizzontale",
-        "vertical": "Verticale",
-        "global": "Centratura Globale",
-        "left": "Sinistra",
-        "right": "Destra",
-        "top": "Alto",
-        "bottom": "Basso",
-        "psa": "PSA",
-        "bgs": "BGS",
-        "sgc": "SGC"
-    },
-    "en": {
-        "title": "CENTERING RESULTS",
-        "horizontal": "Horizontal",
-        "vertical": "Vertical",
-        "global": "Global Centering",
-        "left": "Left",
-        "right": "Right",
-        "top": "Top",
-        "bottom": "Bottom",
-        "psa": "PSA",
-        "bgs": "BGS",
-        "sgc": "SGC"
-    },
-    "fr": {
-        "title": "RÉSULTATS DE CENTRAGE",
-        "horizontal": "Horizontal",
-        "vertical": "Vertical",
-        "global": "Centrage Global",
-        "left": "Gauche",
-        "right": "Droite",
-        "top": "Haut",
-        "bottom": "Bas",
-        "psa": "PSA",
-        "bgs": "BGS",
-        "sgc": "SGC"
-    },
-    "de": {
-        "title": "ZENTRIERUNGSERGEBNISSE",
-        "horizontal": "Horizontal",
-        "vertical": "Vertikal",
-        "global": "Globale Zentrierung",
-        "left": "Links",
-        "right": "Rechts",
-        "top": "Oben",
-        "bottom": "Unten",
-        "psa": "PSA",
-        "bgs": "BGS",
-        "sgc": "SGC"
-    }
-    # Aggiungi altre lingue se vuoi
-}
-
 
 @app.post("/evaluate")
 async def evaluate(
@@ -119,9 +60,52 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # 👇 Preleva la lingua richiesta
+    translations = {
+        "it": {
+            "title": "RISULTATI CENTERING",
+            "horizontal": "Orizzontale",
+            "vertical": "Verticale",
+            "global": "Centratura Globale",
+            "left": "Sinistra",
+            "right": "Destra",
+            "top": "Alto",
+            "bottom": "Basso",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "en": {
+            "title": "CENTERING RESULTS",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Global Centering",
+            "left": "Left",
+            "right": "Right",
+            "top": "Top",
+            "bottom": "Bottom",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "fr": {
+            "title": "RÉSULTATS DE CENTRAGE",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Centrage Global",
+            "left": "Gauche",
+            "right": "Droite",
+            "top": "Haut",
+            "bottom": "Bas",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        # ...altre lingue
+    }
+
     t = translations.get(lang, translations["it"])
 
+    # Colori linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -142,17 +126,18 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
+    # Salvataggio immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # 📄 Genera PDF
+    # Creazione PDF centrato
     pdf = FPDF()
     pdf.add_page()
-    font_path = os.path.join("backend", "fonts", "DejaVuSans.ttf")
+    font_path = os.path.join("fonts", "DejaVuSans.ttf")
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
-    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
+    pdf.cell(0, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
     pdf.set_font("DejaVu", "", 12)
 
@@ -163,11 +148,17 @@ async def evaluate(
 {t['psa']}: {psa}
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
-
     pdf.multi_cell(0, 10, text)
-    pdf.image(temp_path, x=30, y=80, w=150)
 
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    # Calcolo dimensioni e centratura immagine
+    img_width = 120
+    img_height = img_width * h / w
+    x = (210 - img_width) / 2
+    y = pdf.get_y() + 10
+
+    pdf.image(temp_path, x=x, y=y, w=img_width, h=img_height)
+
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
@@ -184,6 +175,4 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-
-# Serve il frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
