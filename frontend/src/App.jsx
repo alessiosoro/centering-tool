@@ -63,7 +63,7 @@ function App() {
       evaluateLive();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [guides, language]);
+  }, [guides]);
 
   const languages = [
     { code: "it", flag: "🇮🇹" },
@@ -77,6 +77,13 @@ function App() {
     { code: "ja", flag: "🇯🇵" },
   ];
 
+  const handleLanguageChange = (code) => {
+    setLanguage(code);
+    setTimeout(() => {
+      if (imageFile) evaluateLive();
+    }, 50);
+  };
+
   return (
     <div>
       <div className="header">
@@ -86,7 +93,7 @@ function App() {
           {languages.map((lang) => (
             <button
               key={lang.code}
-              onClick={() => setLanguage(lang.code)}
+              onClick={() => handleLanguageChange(lang.code)}
               className={`lang-btn ${language === lang.code ? "active" : ""}`}
               title={lang.code.toUpperCase()}
             >
