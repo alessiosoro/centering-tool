@@ -21,17 +21,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ROUTE PRINCIPALE
 @app.post("/evaluate")
 async def evaluate(
     file: UploadFile,
     guides: str = Form(...),
     lang: str = Form("it")
 ):
+    # Carica immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
+    # Calcolo mm reali
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -44,6 +47,7 @@ async def evaluate(
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
 
+    # Punteggi
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -61,6 +65,7 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
+    # Traduzioni
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -100,11 +105,12 @@ async def evaluate(
             "psa": "PSA",
             "bgs": "BGS",
             "sgc": "SGC"
-        }
+        },
     }
 
     t = translations.get(lang, translations["it"])
 
+    # Linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -125,13 +131,15 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
+    # Salva immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
+    # Genera PDF
     pdf = FPDF()
     pdf.add_page()
-    font_path = os.path.join("fonts", "DejaVuSans.ttf")
+    font_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf"))
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
 
@@ -150,7 +158,6 @@ async def evaluate(
     pdf.multi_cell(0, 10, text)
     pdf.image(temp_path, x=30, y=80, w=150)
 
-    # 🔥 RIMOSSA LA SCRITTURA SU DISCO!
     pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
@@ -168,4 +175,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
+# Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
