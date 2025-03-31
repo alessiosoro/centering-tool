@@ -26,7 +26,7 @@ app.add_middleware(
 async def evaluate(
     file: UploadFile,
     guides: str = Form(...),
-    lang: str = Form("it")  # 👈 accetta lingua
+    lang: str = Form("it")
 ):
     # Carica immagine
     image_data = await file.read()
@@ -105,8 +105,7 @@ async def evaluate(
             "psa": "PSA",
             "bgs": "BGS",
             "sgc": "SGC"
-        },
-        # Puoi aggiungere altre lingue qui...
+        }
     }
 
     t = translations.get(lang, translations["it"])
@@ -137,10 +136,12 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Genera PDF con font UTF-8
+    # Percorso assoluto del font nella directory backend/fonts
+    font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
+
+    # Genera PDF
     pdf = FPDF()
     pdf.add_page()
-    font_path = os.path.join("fonts", "DejaVuSans.ttf")
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
 
