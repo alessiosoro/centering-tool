@@ -13,19 +13,46 @@ h1 {
   color: #f2f2f2;
 }
 
-button {
-  background-color: #444;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
+.subtitle {
+  text-align: center;
+  margin-top: 10px;
   font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
+  color: #ccc;
 }
 
-button:hover {
-  background-color: #666;
+/* ========== LANGUAGE PANEL ========== */
+.language-panel {
+  display: flex;
+  justify-content: center;
+  margin: 12px auto 25px auto;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  padding: 5px;
+}
+
+.lang-btn:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.lang-btn.active {
+  opacity: 1;
+  border-bottom: 2px solid #fff;
+}
+
+.flag-icon {
+  width: 24px;
+  height: 18px;
+  border-radius: 3px;
+  box-shadow: 0 0 3px #000;
 }
 
 /* ========== CANVAS + GUIDES ========== */
@@ -80,67 +107,6 @@ button:hover {
 .image-section {
   flex: 1 1 600px;
   max-width: 600px;
-}
-
-.results-section {
-  flex: 1 1 300px;
-  background-color: #2a2a2a;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.1);
-}
-
-.results-section h2 {
-  margin-top: 0;
-  color: #f0f0f0;
-}
-
-.result-box {
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: #3a3a3a;
-  border-radius: 8px;
-}
-
-.result-box span {
-  display: block;
-  font-size: 14px;
-  color: #ccc;
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background-color: #111;
-  color: #fff;
-  margin-right: 8px;
-  font-weight: bold;
-}
-
-/* ========== UPLOADER ========== */
-.uploader {
-  border: 2px dashed #666;
-  padding: 30px;
-  text-align: center;
-  border-radius: 12px;
-  color: #aaa;
-  background-color: #2a2a2a;
-  transition: border 0.3s;
-}
-
-.uploader.dragover {
-  border-color: #00bfff;
-  color: #fff;
-}
-
-.uploader input {
-  display: none;
-}
-
-.uploader-label {
-  font-size: 16px;
-  cursor: pointer;
 }
 
 .results-section {
@@ -214,7 +180,32 @@ button:hover {
   border: 1px solid #fff;
 }
 
-/* Tabs */
+/* ========== UPLOADER ========== */
+.uploader {
+  border: 2px dashed #666;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  color: #aaa;
+  background-color: #2a2a2a;
+  transition: border 0.3s;
+}
+
+.uploader.dragover {
+  border-color: #00bfff;
+  color: #fff;
+}
+
+.uploader input {
+  display: none;
+}
+
+.uploader-label {
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ========== TABS ========== */
 .tabs-container {
   max-width: 900px;
   margin: 0 auto 30px auto;
@@ -255,31 +246,4 @@ button:hover {
 .tab-panel p {
   margin: 8px 0;
   line-height: 1.5;
-}
-
-.language-panel {
-  display: flex;
-  justify-content: center;
-  margin: 12px auto 25px auto;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.lang-btn {
-  font-size: 20px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.lang-btn:hover {
-  transform: scale(1.2);
-  opacity: 1;
-}
-
-.lang-btn.active {
-  opacity: 1;
-  border-bottom: 2px solid #fff;
 }
