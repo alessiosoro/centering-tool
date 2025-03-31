@@ -1,4 +1,4 @@
-/* BASE DARK THEME */
+/* ========== BASE DARK THEME ========== */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,7 +28,7 @@ button:hover {
   background-color: #666;
 }
 
-/* CANVAS + GUIDES */
+/* ========== CANVAS + GUIDES ========== */
 .canvas-container {
   display: flex;
   justify-content: center;
@@ -45,7 +45,7 @@ button:hover {
   width: 100%;
   display: block;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
   position: relative;
   z-index: 1;
 }
@@ -56,26 +56,19 @@ button:hover {
   z-index: 2;
 }
 
-.guide-line.horizontal {
-  height: 2px;
-}
-
-.guide-line.vertical {
-  width: 2px;
-}
-
 /* Cursori */
 .guide-cursor {
   position: absolute;
   width: 20px;
   height: 20px;
-  z-index: 5;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: grab;
-  pointer-events: all;
+  z-index: 5;
+  border: 2px solid #000;
+  box-shadow: 0 0 4px rgba(255,255,255,0.3);
 }
 
-/* LAYOUT */
+/* ========== LAYOUT ========== */
 .container {
   display: flex;
   justify-content: center;
@@ -126,7 +119,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* UPLOADER */
+/* ========== UPLOADER ========== */
 .uploader {
   border: 2px dashed #666;
   padding: 30px;
