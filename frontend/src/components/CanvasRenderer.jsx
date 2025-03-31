@@ -63,4 +63,3 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 };
 
 export default CanvasRenderer;
-
