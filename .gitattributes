@@ -40,3 +40,6 @@ backend/fonts/NotoSansCJKkr-Regular.otf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/NotoSansCJKsc-Regular.otf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/NotoSansCJKtc-Regular.otf filter=lfs diff=lfs merge=lfs -text
 backend/fonts/Roboto-Regular.ttf filter=lfs diff=lfs merge=lfs -text
+backend/fonts/NotoSansJP-Regular.ttf filter=lfs diff=lfs merge=lfs -text
+backend/fonts/NotoSansKR-Regular.ttf filter=lfs diff=lfs merge=lfs -text
+backend/fonts/NotoSansSC-Regular.ttf filter=lfs diff=lfs merge=lfs -text
