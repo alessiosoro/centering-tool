@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from typing import Dict
 from PIL import Image, ImageDraw
 from fpdf import FPDF
 import io
@@ -12,7 +13,7 @@ import os
 
 app = FastAPI()
 
-# CORS policy
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,19 +27,20 @@ async def evaluate(
     guides: str = Form(...),
     lang: str = Form("it")
 ):
-    # Caricamento immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcolo dimensioni reali
+    # Calcoli
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
     bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
+
     totalH = left + right
     totalV = top + bottom
+
     horPercent = round((left / totalH) * 1000) / 10 if totalH else 0
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
@@ -60,52 +62,32 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni base
+    # Traduzioni (ridotte per brevità)
     translations = {
-        "it": {
-            "title": "RISULTATI CENTERING",
-            "horizontal": "Orizzontale",
-            "vertical": "Verticale",
-            "global": "Centratura Globale",
-            "left": "Sinistra",
-            "right": "Destra",
-            "top": "Alto",
-            "bottom": "Basso",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "en": {
-            "title": "CENTERING RESULTS",
-            "horizontal": "Horizontal",
-            "vertical": "Vertical",
-            "global": "Global Centering",
-            "left": "Left",
-            "right": "Right",
-            "top": "Top",
-            "bottom": "Bottom",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "fr": {
-            "title": "RÉSULTATS DE CENTRAGE",
-            "horizontal": "Horizontal",
-            "vertical": "Vertical",
-            "global": "Centrage Global",
-            "left": "Gauche",
-            "right": "Droite",
-            "top": "Haut",
-            "bottom": "Bas",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        }
+        "it": {"title": "RISULTATI CENTERING", "horizontal": "Orizzontale", "vertical": "Verticale", "global": "Centratura Globale", "left": "Sinistra", "right": "Destra", "top": "Alto", "bottom": "Basso", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "en": {"title": "CENTERING RESULTS", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Global Centering", "left": "Left", "right": "Right", "top": "Top", "bottom": "Bottom", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "fr": {"title": "RÉSULTATS DE CENTRAGE", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centrage Global", "left": "Gauche", "right": "Droite", "top": "Haut", "bottom": "Bas", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "de": {"title": "ZENTRIERUNGSERGEBNISSE", "horizontal": "Horizontal", "vertical": "Vertikal", "global": "Globale Zentrierung", "left": "Links", "right": "Rechts", "top": "Oben", "bottom": "Unten", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "es": {"title": "RESULTADOS DE CENTRADO", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centrado Global", "left": "Izquierda", "right": "Derecha", "top": "Superior", "bottom": "Inferior", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "pt": {"title": "RESULTADOS DE CENTRALIZAÇÃO", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centralização Global", "left": "Esquerda", "right": "Direita", "top": "Topo", "bottom": "Fundo", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "zh": {"title": "居中结果", "horizontal": "水平", "vertical": "垂直", "global": "整体居中", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "ko": {"title": "중심 정렬 결과", "horizontal": "수평", "vertical": "수직", "global": "전체 중심 정렬", "left": "왼쪽", "right": "오른쪽", "top": "위", "bottom": "아래", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "ja": {"title": "センタリング結果", "horizontal": "水平", "vertical": "垂直", "global": "全体のセンタリング", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"}
     }
 
-    t = translations.get(lang, translations["it"])
+    t = translations.get(lang, translations["en"])
 
-    # Disegna le guide
+    # Font selection
+    font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+    font_map = {
+        "zh": "NotoSansCJKsc-Regular.otf",
+        "ja": "NotoSansCJKjp-Regular.otf",
+        "ko": "NotoSansCJKkr-Regular.otf",
+    }
+    font_file = font_map.get(lang, "DejaVuSans.ttf")
+    font_path = os.path.join(font_dir, font_file)
+
+    # Disegna linee
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -131,22 +113,15 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Costruzione PDF
+    # PDF
     pdf = FPDF()
     pdf.add_page()
+    pdf.add_font("CustomFont", "", font_path, uni=True)
+    pdf.set_font("CustomFont", "", 14)
 
-    # Font
-    font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
-    if os.path.exists(font_path):
-        pdf.add_font("DejaVu", "", font_path, uni=True)
-        pdf.set_font("DejaVu", "", 14)
-    else:
-        pdf.set_font("Arial", "", 14)
-
-    pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("DejaVu" if os.path.exists(font_path) else "Arial", "", 12)
+    pdf.set_font("CustomFont", "", 12)
 
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
@@ -159,7 +134,7 @@ async def evaluate(
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Immagine centrata
+    # Centra immagine
     img_width = 150
     x_img = (210 - img_width) / 2
     pdf.image(temp_path, x=x_img, y=100, w=img_width)
@@ -182,5 +157,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Monta frontend statico
+# Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
