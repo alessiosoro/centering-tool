@@ -12,7 +12,7 @@ const guideColors = {
   rightInner: "#00bfff",
 };
 
-const CanvasRenderer = ({ image, guides, onGuideChange }) => {
+const CanvasRenderer = ({ image, guides, onGuideChange, translations }) => {
   const wrapperRef = useRef();
   const imageRef = useRef();
   const [dragging, setDragging] = useState(null);
@@ -52,6 +52,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
+
         {/* LINEE GUIDA */}
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
@@ -64,9 +65,11 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
               key={key}
               className="guide-line"
               style={{ ...style, backgroundColor: guideColors[key] }}
+              title={translations[key]}
             />
           );
         })}
+
         {/* CURSORI */}
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
@@ -88,6 +91,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
               className="guide-cursor"
               style={{ ...style, backgroundColor: guideColors[key] }}
               onMouseDown={(e) => handleMouseDown(e, key)}
+              title={translations[key]}
             />
           );
         })}
