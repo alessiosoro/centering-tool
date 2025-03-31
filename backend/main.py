@@ -2,7 +2,6 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Dict
 from PIL import Image, ImageDraw
 from fpdf import FPDF
 import io
@@ -62,41 +61,24 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni (ridotte per brevità)
+    # Traduzioni minime
     translations = {
         "it": {"title": "RISULTATI CENTERING", "horizontal": "Orizzontale", "vertical": "Verticale", "global": "Centratura Globale", "left": "Sinistra", "right": "Destra", "top": "Alto", "bottom": "Basso", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
         "en": {"title": "CENTERING RESULTS", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Global Centering", "left": "Left", "right": "Right", "top": "Top", "bottom": "Bottom", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
         "fr": {"title": "RÉSULTATS DE CENTRAGE", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centrage Global", "left": "Gauche", "right": "Droite", "top": "Haut", "bottom": "Bas", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "de": {"title": "ZENTRIERUNGSERGEBNISSE", "horizontal": "Horizontal", "vertical": "Vertikal", "global": "Globale Zentrierung", "left": "Links", "right": "Rechts", "top": "Oben", "bottom": "Unten", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "es": {"title": "RESULTADOS DE CENTRADO", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centrado Global", "left": "Izquierda", "right": "Derecha", "top": "Superior", "bottom": "Inferior", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "pt": {"title": "RESULTADOS DE CENTRALIZAÇÃO", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Centralização Global", "left": "Esquerda", "right": "Direita", "top": "Topo", "bottom": "Fundo", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
         "zh": {"title": "居中结果", "horizontal": "水平", "vertical": "垂直", "global": "整体居中", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "ko": {"title": "중심 정렬 결과", "horizontal": "수평", "vertical": "수직", "global": "전체 중심 정렬", "left": "왼쪽", "right": "오른쪽", "top": "위", "bottom": "아래", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "ja": {"title": "センタリング結果", "horizontal": "水平", "vertical": "垂直", "global": "全体のセンタリング", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"}
+        "ja": {"title": "センタリング結果", "horizontal": "水平", "vertical": "垂直", "global": "全体のセンタリング", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
+        "ko": {"title": "중심 정렬 결과", "horizontal": "수평", "vertical": "수직", "global": "전체 중심", "left": "왼쪽", "right": "오른쪽", "top": "위", "bottom": "아래", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
     }
 
-    t = translations.get(lang, translations["en"])
+    t = translations.get(lang, translations["it"])
 
-    # Font selection
-    font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-    font_map = {
-        "zh": "NotoSansCJKsc-Regular.otf",
-        "ja": "NotoSansCJKjp-Regular.otf",
-        "ko": "NotoSansCJKkr-Regular.otf",
-    }
-    font_file = font_map.get(lang, "DejaVuSans.ttf")
-    font_path = os.path.join(font_dir, font_file)
-
-    # Disegna linee
+    # Disegna linee guida
     colors = {
-        "topOuter": "#ff00ff",
-        "topInner": "#ff69b4",
-        "bottomOuter": "#ffaa00",
-        "bottomInner": "#ffcc00",
-        "leftOuter": "#ff4444",
-        "leftInner": "#dd2222",
-        "rightOuter": "#00ffff",
-        "rightInner": "#00bfff",
+        "topOuter": "#ff00ff", "topInner": "#ff69b4",
+        "bottomOuter": "#ffaa00", "bottomInner": "#ffcc00",
+        "leftOuter": "#ff4444", "leftInner": "#dd2222",
+        "rightOuter": "#00ffff", "rightInner": "#00bfff",
     }
 
     draw = ImageDraw.Draw(image)
@@ -108,22 +90,39 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # Salva immagine temporanea
+    # Salva immagine
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-        temp_path = tmp.name
-        image.save(temp_path, format="JPEG")
+        image_path = tmp.name
+        image.save(image_path, format="JPEG")
 
     # PDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font("CustomFont", "", font_path, uni=True)
-    pdf.set_font("CustomFont", "", 14)
 
+    # Scegli font
+    font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+    font_map = {
+        "zh": "NotoSansCJK-Regular.otf",
+        "ja": "NotoSansCJK-Regular.otf",
+        "ko": "NotoSansCJK-Regular.otf",
+    }
+    font_file = font_map.get(lang, "DejaVuSans.ttf")
+    font_path = os.path.join(font_dir, font_file)
+    font_name = "Universal"
+
+    if os.path.exists(font_path):
+        pdf.add_font(font_name, "", font_path, uni=True)
+        pdf.set_font(font_name, "", 14)
+    else:
+        pdf.set_font("Arial", "", 14)
+
+    # Testo PDF
+    pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("CustomFont", "", 12)
+    pdf.set_font(font_name, "", 12)
 
-    text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
+    content = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
 
@@ -132,15 +131,15 @@ async def evaluate(
 {t['sgc']}: {sgc}"""
 
     pdf.set_x(20)
-    pdf.multi_cell(0, 10, text)
+    pdf.multi_cell(0, 10, content)
 
-    # Centra immagine
+    # Inserisci immagine centrata
     img_width = 150
     x_img = (210 - img_width) / 2
-    pdf.image(temp_path, x=x_img, y=100, w=img_width)
+    pdf.image(image_path, x=x_img, y=100, w=img_width)
 
     # Codifica PDF
-    pdf_data = pdf.output(dest="S").encode("latin1")
+    pdf_data = pdf.output(dest="S").encode("latin1", errors="ignore")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
@@ -157,6 +156,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Frontend statico
+# Serve React frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
-
