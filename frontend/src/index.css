@@ -50,13 +50,12 @@ button:hover {
   z-index: 1;
 }
 
-/* Linee guida */
 .guide-line {
   position: absolute;
   z-index: 2;
+  pointer-events: none;
 }
 
-/* Cursori */
 .guide-cursor {
   position: absolute;
   width: 20px;
