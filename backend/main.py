@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ROUTE PRINCIPALE
 @app.post("/evaluate")
 async def evaluate(
     file: UploadFile,
@@ -32,11 +33,12 @@ async def evaluate(
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcoli
+    # Calcolo mm reali
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
     bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
+
     totalH = left + right
     totalV = top + bottom
 
@@ -100,85 +102,7 @@ async def evaluate(
             "psa": "PSA",
             "bgs": "BGS",
             "sgc": "SGC"
-        },
-        "de": {
-            "title": "ZENTRIERUNGSERGEBNISSE",
-            "horizontal": "Horizontal",
-            "vertical": "Vertikal",
-            "global": "Globale Zentrierung",
-            "left": "Links",
-            "right": "Rechts",
-            "top": "Oben",
-            "bottom": "Unten",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "es": {
-            "title": "RESULTADOS DE CENTRADO",
-            "horizontal": "Horizontal",
-            "vertical": "Vertical",
-            "global": "Centrado Global",
-            "left": "Izquierda",
-            "right": "Derecha",
-            "top": "Superior",
-            "bottom": "Inferior",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "pt": {
-            "title": "RESULTADOS DE CENTRALIZAÇÃO",
-            "horizontal": "Horizontal",
-            "vertical": "Vertical",
-            "global": "Centralização Global",
-            "left": "Esquerda",
-            "right": "Direita",
-            "top": "Superior",
-            "bottom": "Inferior",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "zh": {
-            "title": "居中结果",
-            "horizontal": "水平",
-            "vertical": "垂直",
-            "global": "整体居中",
-            "left": "左边",
-            "right": "右边",
-            "top": "上边",
-            "bottom": "下边",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "ko": {
-            "title": "중심 정렬 결과",
-            "horizontal": "수평",
-            "vertical": "수직",
-            "global": "전체 정렬",
-            "left": "왼쪽",
-            "right": "오른쪽",
-            "top": "상단",
-            "bottom": "하단",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
-        "ja": {
-            "title": "センタリング結果",
-            "horizontal": "水平",
-            "vertical": "垂直",
-            "global": "全体のセンタリング",
-            "left": "左",
-            "right": "右",
-            "top": "上",
-            "bottom": "下",
-            "psa": "PSA",
-            "bgs": "BGS",
-            "sgc": "SGC"
-        },
+        }
     }
 
     t = translations.get(lang, translations["it"])
@@ -209,7 +133,6 @@ async def evaluate(
 
     pdf = FPDF()
     pdf.add_page()
-
     font_path = os.path.join("backend", "fonts", "DejaVuSans.ttf")
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
@@ -227,9 +150,14 @@ async def evaluate(
 {t['sgc']}: {sgc}"""
 
     pdf.multi_cell(0, 10, text)
-    pdf.image(temp_path, x=30, y=80, w=150)
 
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    # Centra l'immagine nella pagina
+    img_width = 150
+    page_width = 210
+    x_pos = (page_width - img_width) / 2
+    pdf.image(temp_path, x=x_pos, y=pdf.get_y() + 10, w=img_width)
+
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
@@ -246,5 +174,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Frontend
+# Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
