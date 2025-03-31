@@ -1,4 +1,3 @@
-# main.py
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -20,14 +19,134 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+translations = {
+    "it": {
+        "title": "RISULTATI CENTERING",
+        "horizontal": "Orizzontale",
+        "vertical": "Verticale",
+        "global": "Centratura Globale",
+        "left": "Sinistra",
+        "right": "Destra",
+        "top": "Alto",
+        "bottom": "Basso",
+        "psa": "Voto PSA",
+        "bgs": "Voto BGS",
+        "sgc": "Voto SGC",
+    },
+    "en": {
+        "title": "CENTERING RESULTS",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "global": "Global Centering",
+        "left": "Left",
+        "right": "Right",
+        "top": "Top",
+        "bottom": "Bottom",
+        "psa": "PSA Grade",
+        "bgs": "BGS Grade",
+        "sgc": "SGC Grade",
+    },
+    "fr": {
+        "title": "RÉSULTATS CENTRAGE",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "global": "Centrage Global",
+        "left": "Gauche",
+        "right": "Droite",
+        "top": "Haut",
+        "bottom": "Bas",
+        "psa": "Note PSA",
+        "bgs": "Note BGS",
+        "sgc": "Note SGC",
+    },
+    "de": {
+        "title": "ZENTRIERUNGSERGEBNISSE",
+        "horizontal": "Horizontal",
+        "vertical": "Vertikal",
+        "global": "Globale Zentrierung",
+        "left": "Links",
+        "right": "Rechts",
+        "top": "Oben",
+        "bottom": "Unten",
+        "psa": "PSA Bewertung",
+        "bgs": "BGS Bewertung",
+        "sgc": "SGC Bewertung",
+    },
+    "es": {
+        "title": "RESULTADOS DE CENTRADO",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "global": "Centrado Global",
+        "left": "Izquierda",
+        "right": "Derecha",
+        "top": "Arriba",
+        "bottom": "Abajo",
+        "psa": "Nota PSA",
+        "bgs": "Nota BGS",
+        "sgc": "Nota SGC",
+    },
+    "pt": {
+        "title": "RESULTADOS DE CENTRALIZAÇÃO",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "global": "Centralização Global",
+        "left": "Esquerda",
+        "right": "Direita",
+        "top": "Superior",
+        "bottom": "Inferior",
+        "psa": "Nota PSA",
+        "bgs": "Nota BGS",
+        "sgc": "Nota SGC",
+    },
+    "zh": {
+        "title": "居中结果",
+        "horizontal": "水平",
+        "vertical": "垂直",
+        "global": "整体居中",
+        "left": "左",
+        "right": "右",
+        "top": "上",
+        "bottom": "下",
+        "psa": "PSA评分",
+        "bgs": "BGS评分",
+        "sgc": "SGC评分",
+    },
+    "ko": {
+        "title": "중심 정렬 결과",
+        "horizontal": "수평",
+        "vertical": "수직",
+        "global": "전체 중심 정렬",
+        "left": "왼쪽",
+        "right": "오른쪽",
+        "top": "상단",
+        "bottom": "하단",
+        "psa": "PSA 점수",
+        "bgs": "BGS 점수",
+        "sgc": "SGC 점수",
+    },
+    "ja": {
+        "title": "センタリング結果",
+        "horizontal": "水平",
+        "vertical": "垂直",
+        "global": "全体のセンタリング",
+        "left": "左",
+        "right": "右",
+        "top": "上",
+        "bottom": "下",
+        "psa": "PSA評価",
+        "bgs": "BGS評価",
+        "sgc": "SGC評価",
+    }
+}
+
 @app.post("/evaluate")
-async def evaluate(file: UploadFile, guides: str = Form(...)):
+async def evaluate(file: UploadFile, guides: str = Form(...), lang: str = Form("it")):
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcolo dei mm reali (in valore assoluto)
+    # Calcoli
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -57,7 +176,7 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Colori linee guida
+    # Disegna le linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -82,19 +201,24 @@ async def evaluate(file: UploadFile, guides: str = Form(...)):
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
+    t = translations.get(lang, translations["it"])
+
+    # Crea PDF localizzato
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=14)
-    pdf.cell(200, 10, txt="RISULTATI CENTERING", ln=True, align="C")
+    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
     pdf.set_font("Arial", size=12)
     pdf.ln(10)
-    text = f"""Orizzontale: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
-Verticale: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
-Centratura Globale: {globalPercent}%
 
-PSA: {psa}
-BGS: {bgs}
-SGC: {sgc}"""
+    text = f"""{t['horizontal']}: {horPercent}% ({t['left']}: {left:.2f} mm / {t['right']}: {right:.2f} mm)
+{t['vertical']}: {verPercent}% ({t['top']}: {top:.2f} mm / {t['bottom']}: {bottom:.2f} mm)
+{t['global']}: {globalPercent}%
+
+{t['psa']}: {psa}
+{t['bgs']}: {bgs}
+{t['sgc']}: {sgc}"""
+
     pdf.multi_cell(0, 10, text)
     pdf.image(temp_path, x=30, y=80, w=150)
 
@@ -116,4 +240,3 @@ SGC: {sgc}"""
     })
 
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
-
