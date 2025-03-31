@@ -31,7 +31,6 @@ function App() {
     setImageFile(file);
     setImagePreview(preview);
     setResult(null);
-    // Analisi iniziale
     setTimeout(() => {
       evaluateLive(file, guides, language);
     }, 100);
@@ -72,13 +71,11 @@ function App() {
     }
   }, [guides]);
 
-  // 🔥 IMPORTANTE: rianalizza subito con nuova lingua
-  const handleLanguageChange = (code) => {
-    setLanguage(code);
+  useEffect(() => {
     if (imageFile) {
-      evaluateLive(imageFile, guides, code);
+      evaluateLive(imageFile, guides, language);
     }
-  };
+  }, [language]);
 
   const languages = [
     { code: "it", flag: "it" },
@@ -91,6 +88,14 @@ function App() {
     { code: "ko", flag: "kr" },
     { code: "ja", flag: "jp" },
   ];
+
+  const handleLanguageChange = (code) => {
+    setLanguage(code);
+    setResult(null);
+    if (imageFile) {
+      evaluateLive(imageFile, guides, code); // 👈 corregge il problema!
+    }
+  };
 
   return (
     <div>
