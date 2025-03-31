@@ -1,4 +1,4 @@
-/* ========== BASE DARK THEME ========== */
+/* BASE DARK THEME */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,7 +28,7 @@ button:hover {
   background-color: #666;
 }
 
-/* ========== CANVAS + GUIDES ========== */
+/* CANVAS + GUIDES */
 .canvas-container {
   display: flex;
   justify-content: center;
@@ -45,45 +45,37 @@ button:hover {
   width: 100%;
   display: block;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 1;
 }
 
-/* GUIDE LINES */
+/* Linee guida */
 .guide-line {
   position: absolute;
-  z-index: 5;
+  z-index: 2;
 }
 
-/* CURSORS */
-.guide-handle {
+.guide-line.horizontal {
+  height: 2px;
+}
+
+.guide-line.vertical {
+  width: 2px;
+}
+
+/* Cursori */
+.guide-cursor {
   position: absolute;
   width: 20px;
   height: 20px;
-  background-color: red; /* fallback */
-  border: 2px solid white;
-  border-radius: 4px;
+  z-index: 5;
+  border-radius: 3px;
   cursor: grab;
-  z-index: 10;
   pointer-events: all;
-  user-select: none;
-  transform: translate(-50%, -50%);
 }
 
-/* ========== COLOR VARIABILI ========== */
-:root {
-  --topOuter: #ff00ff;
-  --topInner: #ff69b4;
-  --bottomOuter: #ffaa00;
-  --bottomInner: #ffcc00;
-  --leftOuter: #ff4444;
-  --leftInner: #dd2222;
-  --rightOuter: #00ffff;
-  --rightInner: #00bfff;
-}
-
-/* ========== LAYOUT ========== */
+/* LAYOUT */
 .container {
   display: flex;
   justify-content: center;
@@ -134,7 +126,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* ========== UPLOADER ========== */
+/* UPLOADER */
 .uploader {
   border: 2px dashed #666;
   padding: 30px;
@@ -158,4 +150,3 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
-
