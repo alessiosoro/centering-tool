@@ -21,25 +21,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ROUTE PRINCIPALE
 @app.post("/evaluate")
 async def evaluate(
     file: UploadFile,
     guides: str = Form(...),
     lang: str = Form("it")
 ):
-    # Carica immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcolo mm reali
+    # Calcoli
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
     bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
-
     totalH = left + right
     totalV = top + bottom
 
@@ -47,7 +44,6 @@ async def evaluate(
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
 
-    # Punteggi
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -65,7 +61,6 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -106,12 +101,88 @@ async def evaluate(
             "bgs": "BGS",
             "sgc": "SGC"
         },
-        # Aggiungi altre lingue se serve
+        "de": {
+            "title": "ZENTRIERUNGSERGEBNISSE",
+            "horizontal": "Horizontal",
+            "vertical": "Vertikal",
+            "global": "Globale Zentrierung",
+            "left": "Links",
+            "right": "Rechts",
+            "top": "Oben",
+            "bottom": "Unten",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "es": {
+            "title": "RESULTADOS DE CENTRADO",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Centrado Global",
+            "left": "Izquierda",
+            "right": "Derecha",
+            "top": "Superior",
+            "bottom": "Inferior",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "pt": {
+            "title": "RESULTADOS DE CENTRALIZAÇÃO",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Centralização Global",
+            "left": "Esquerda",
+            "right": "Direita",
+            "top": "Superior",
+            "bottom": "Inferior",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "zh": {
+            "title": "居中结果",
+            "horizontal": "水平",
+            "vertical": "垂直",
+            "global": "整体居中",
+            "left": "左边",
+            "right": "右边",
+            "top": "上边",
+            "bottom": "下边",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "ko": {
+            "title": "중심 정렬 결과",
+            "horizontal": "수평",
+            "vertical": "수직",
+            "global": "전체 정렬",
+            "left": "왼쪽",
+            "right": "오른쪽",
+            "top": "상단",
+            "bottom": "하단",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "ja": {
+            "title": "センタリング結果",
+            "horizontal": "水平",
+            "vertical": "垂直",
+            "global": "全体のセンタリング",
+            "left": "左",
+            "right": "右",
+            "top": "上",
+            "bottom": "下",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
     }
 
     t = translations.get(lang, translations["it"])
 
-    # Linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -132,37 +203,33 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # Salva immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Genera PDF
-    pdf = FPDF(format='A4')
+    pdf = FPDF()
     pdf.add_page()
-    font_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf"))
+
+    font_path = os.path.join("backend", "fonts", "DejaVuSans.ttf")
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
 
-    pdf.set_text_color(0)
-    pdf.cell(0, 10, txt=t["title"], ln=True, align="C")
+    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-
     pdf.set_font("DejaVu", "", 12)
-    pdf.set_text_color(0)
-    pdf.multi_cell(0, 8, txt=f"""
-{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
+
+    text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
 
 {t['psa']}: {psa}
 {t['bgs']}: {bgs}
-{t['sgc']}: {sgc}
-""")
+{t['sgc']}: {sgc}"""
 
+    pdf.multi_cell(0, 10, text)
     pdf.image(temp_path, x=30, y=80, w=150)
 
-    pdf_data = pdf.output(dest="S").encode("latin1")
+    pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
@@ -179,5 +246,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Frontend statico
+# Frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
