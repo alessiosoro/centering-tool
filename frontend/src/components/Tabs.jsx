@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "../index.css";
 
-const Tabs = () => {
+const Tabs = ({ translations }) => {
   const [activeTab, setActiveTab] = useState("istruzioni");
+  const t = translations;
 
   return (
     <div className="tabs-container">
@@ -11,32 +12,31 @@ const Tabs = () => {
           className={activeTab === "istruzioni" ? "active" : ""}
           onClick={() => setActiveTab("istruzioni")}
         >
-          📘 Istruzioni
+          {t.instructionsTab}
         </button>
         <button
           className={activeTab === "disclaimer" ? "active" : ""}
           onClick={() => setActiveTab("disclaimer")}
         >
-          ⚠️ Disclaimer
+          {t.disclaimerTitle}
         </button>
       </div>
 
       <div className="tab-content">
         {activeTab === "istruzioni" && (
           <div className="tab-panel">
-            <p>📤 Carica l'immagine della tua carta da analizzare.</p>
-            <p>🎯 Sposta i cursori colorati per allineare i bordi interni ed esterni.</p>
-            <p>📊 I risultati della centratura verranno aggiornati automaticamente mentre muovi i cursori.</p>
-            <p>📄 Puoi scaricare un PDF con i risultati e l'immagine annotata.</p>
-            <p>🔁 Usa il tasto "Carica nuova immagine" per ripartire da zero.</p>
+            <p>📤 {t.uploadInstruction}</p>
+            <p>🎯 {t.dragGuides}</p>
+            <p>📊 {t.resultTitle} {t.globalCentering.toLowerCase()} ({t.horizontal.toLowerCase()} / {t.vertical.toLowerCase()})</p>
+            <p>📄 {t.downloadButton}</p>
+            <p>🔁 {t.resetButton}</p>
           </div>
         )}
         {activeTab === "disclaimer" && (
           <div className="tab-panel">
-            <p>⚠️ <strong>Attenzione:</strong> questa è un'applicazione amatoriale.</p>
-            <p>🎓 È pensata per fornire un'idea preliminare della centratura di una carta.</p>
-            <p>❌ I risultati e i voti ipotetici mostrati non sono in alcun modo ufficiali né garantiscono il voto reale da parte delle case di gradazione (PSA, BGS, SGC...)</p>
-            <p>🧪 Usala come strumento di pre-analisi, ma considera sempre una valutazione professionale per il grading ufficiale.</p>
+            {t.disclaimerParagraphs.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </div>
         )}
       </div>
