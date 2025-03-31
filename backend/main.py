@@ -2,7 +2,6 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Dict
 from PIL import Image, ImageDraw
 from fpdf import FPDF
 import io
@@ -13,7 +12,7 @@ import os
 
 app = FastAPI()
 
-# CORS
+# CORS policy
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,20 +26,19 @@ async def evaluate(
     guides: str = Form(...),
     lang: str = Form("it")
 ):
+    # Caricamento immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcoli
+    # Calcolo dimensioni reali
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
     bottom = abs((g["bottomOuter"] - g["bottomInner"]) * h)
-
     totalH = left + right
     totalV = top + bottom
-
     horPercent = round((left / totalH) * 1000) / 10 if totalH else 0
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
@@ -62,7 +60,7 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni
+    # Traduzioni base
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -102,12 +100,12 @@ async def evaluate(
             "psa": "PSA",
             "bgs": "BGS",
             "sgc": "SGC"
-        },
+        }
     }
 
     t = translations.get(lang, translations["it"])
 
-    # Disegna linee
+    # Disegna le guide
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -133,10 +131,11 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # PDF
+    # Costruzione PDF
     pdf = FPDF()
     pdf.add_page()
 
+    # Font
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
     if os.path.exists(font_path):
         pdf.add_font("DejaVu", "", font_path, uni=True)
@@ -160,7 +159,7 @@ async def evaluate(
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine
+    # Immagine centrata
     img_width = 150
     x_img = (210 - img_width) / 2
     pdf.image(temp_path, x=x_img, y=100, w=img_width)
@@ -183,5 +182,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Frontend statico
+# Monta frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
