@@ -159,30 +159,33 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Font path in base alla lingua
+    # Font path
     font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-    if lang in ["zh", "ja", "ko"]:
-        font_path = os.path.join(font_dir, "NotoSansSC-Regular.ttf")  # ✅ compatibile con tutte
+    if lang == "zh":
+        font_path = os.path.join(font_dir, "NotoSansSC-Regular.ttf")
+    elif lang == "ja":
+        font_path = os.path.join(font_dir, "NotoSansJP-Regular.ttf")
+    elif lang == "ko":
+        font_path = os.path.join(font_dir, "NotoSansKR-Regular.ttf")
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
     # Crea PDF
     pdf = FPDF()
     pdf.add_page()
-
     try:
         print(f"🔤 Font selezionato: {font_path}")
         pdf.add_font("MainFont", "", font_path, uni=True)
-        pdf.set_font("MainFont", "", 14)
     except Exception as e:
         print(f"❌ Errore durante il caricamento del font: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
+    pdf.set_font("MainFont", "", 14)
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("MainFont", "", 12)
 
+    pdf.set_font("MainFont", "", 12)
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
@@ -194,13 +197,17 @@ async def evaluate(
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine
+    # Centra immagine correttamente
     img_width = 150
+    img_ratio = image.height / image.width
+    img_height = img_width * img_ratio
     x_img = (210 - img_width) / 2
-    pdf.image(temp_path, x=x_img, y=100, w=img_width)
+    y_img = 130 - img_height / 2
+    y_img = max(10, min(y_img, 297 - img_height - 10))
+    pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
     # Codifica PDF
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
