@@ -88,7 +88,8 @@ function App() {
     <div>
       <div className="header">
         <h1>{t.title}</h1>
-        <p>{t.subtitle}</p>
+        <div className="subtitle">{t.subtitle}</div>
+
         <div className="language-panel">
           {languages.map((lang) => (
             <button
@@ -97,7 +98,11 @@ function App() {
               className={`lang-btn ${language === lang.code ? "active" : ""}`}
               title={lang.code.toUpperCase()}
             >
-              {lang.flag}
+              <img
+                src={`https://flagcdn.com/24x18/${lang.code}.png`}
+                alt={lang.code}
+                className="flag-icon"
+              />
             </button>
           ))}
         </div>
