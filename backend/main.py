@@ -13,7 +13,7 @@ import os
 
 app = FastAPI()
 
-# CORS per il frontend
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,20 +21,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Endpoint di valutazione
 @app.post("/evaluate")
 async def evaluate(
     file: UploadFile,
     guides: str = Form(...),
     lang: str = Form("it")
 ):
-    # Apri immagine
+    # Carica immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcolo mm reali
+    # Calcoli in mm
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -47,7 +46,6 @@ async def evaluate(
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
 
-    # Voto da rapporto
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -111,7 +109,7 @@ async def evaluate(
 
     t = translations.get(lang, translations["it"])
 
-    # Colori delle guide
+    # Linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -141,20 +139,16 @@ async def evaluate(
     pdf = FPDF()
     pdf.add_page()
 
-    # ✅ Percorso assoluto al font
+    # ✅ Usa font assoluto
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
-
-    if not os.path.exists(font_path):
-        raise RuntimeError(f"Font non trovato: {font_path}")
-
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
 
-    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
+    pdf.set_xy(10, 10)
+    pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
     pdf.set_font("DejaVu", "", 12)
 
-    # Testo risultati
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
@@ -163,9 +157,13 @@ async def evaluate(
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
 
+    pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
-    pdf.image(temp_path, x=30, y=90, w=150)
 
+    # Centra immagine sotto il testo
+    pdf.image(temp_path, x=30, y=100, w=150)
+
+    # Base64 PDF
     pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
@@ -183,6 +181,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-
-# Serve il frontend React
+# Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
