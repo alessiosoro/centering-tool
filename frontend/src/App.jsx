@@ -49,14 +49,17 @@ function App() {
       const data = await res.json();
       setResult(data);
     } catch (error) {
-      console.error("Errore durante l'analisi:", error);
+      console.error("Errore analisi live:", error);
     }
   };
 
+  // 🔄 Ricalcolo ottimizzato
   useEffect(() => {
-    if (imageFile) {
-      evaluateLive();
-    }
+    const delayDebounce = setTimeout(() => {
+      if (imageFile) evaluateLive();
+    }, 200); // debounce 200ms
+
+    return () => clearTimeout(delayDebounce);
   }, [guides]);
 
   return (
@@ -68,11 +71,7 @@ function App() {
       {imagePreview && (
         <div className="container">
           <div className="image-section">
-            <CanvasRenderer
-              image={imagePreview}
-              guides={guides}
-              onGuideChange={handleGuideChange}
-            />
+            <CanvasRenderer image={imagePreview} guides={guides} onGuideChange={handleGuideChange} />
             <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
               <button onClick={resetApp}>🔄 Carica nuova immagine</button>
             </div>
@@ -89,4 +88,3 @@ function App() {
 }
 
 export default App;
-
