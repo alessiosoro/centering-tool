@@ -106,6 +106,7 @@ async def evaluate(
             "bgs": "BGS",
             "sgc": "SGC"
         },
+        # Aggiungi altre lingue se serve
     }
 
     t = translations.get(lang, translations["it"])
@@ -137,28 +138,31 @@ async def evaluate(
         image.save(temp_path, format="JPEG")
 
     # Genera PDF
-    pdf = FPDF()
+    pdf = FPDF(format='A4')
     pdf.add_page()
     font_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf"))
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
 
-    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
+    pdf.set_text_color(0)
+    pdf.cell(0, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("DejaVu", "", 12)
 
-    text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
+    pdf.set_font("DejaVu", "", 12)
+    pdf.set_text_color(0)
+    pdf.multi_cell(0, 8, txt=f"""
+{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
 
 {t['psa']}: {psa}
 {t['bgs']}: {bgs}
-{t['sgc']}: {sgc}"""
+{t['sgc']}: {sgc}
+""")
 
-    pdf.multi_cell(0, 10, text)
     pdf.image(temp_path, x=30, y=80, w=150)
 
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
