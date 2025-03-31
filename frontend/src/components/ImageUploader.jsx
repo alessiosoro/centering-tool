@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import "../index.css";
 
-const ImageUploader = ({ onImageUpload }) => {
+const ImageUploader = ({ onImageUpload, translations }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef();
+  const t = translations;
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -58,10 +59,9 @@ const ImageUploader = ({ onImageUpload }) => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
-      <p className="uploader-label">📤 Trascina qui la tua carta oppure clicca per caricare</p>
+      <p className="uploader-label">📤 {t.uploadInstruction}</p>
     </div>
   );
 };
 
 export default ImageUploader;
-
