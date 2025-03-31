@@ -13,6 +13,7 @@ import os
 
 app = FastAPI()
 
+# CORS per il frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,17 +21,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Endpoint di valutazione
 @app.post("/evaluate")
 async def evaluate(
     file: UploadFile,
     guides: str = Form(...),
     lang: str = Form("it")
 ):
+    # Apri immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
+    # Calcolo mm reali
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -43,6 +47,7 @@ async def evaluate(
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
 
+    # Voto da rapporto
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -60,6 +65,7 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
+    # Traduzioni
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -100,12 +106,12 @@ async def evaluate(
             "bgs": "BGS",
             "sgc": "SGC"
         },
-        # ...altre lingue
+        # Aggiungi altre lingue se vuoi
     }
 
     t = translations.get(lang, translations["it"])
 
-    # Colori linee guida
+    # Colori delle guide
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -126,21 +132,29 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # Salvataggio immagine temporanea
+    # Salva immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Creazione PDF centrato
+    # Crea PDF
     pdf = FPDF()
     pdf.add_page()
-    font_path = os.path.join("fonts", "DejaVuSans.ttf")
+
+    # ✅ Percorso assoluto al font
+    font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
+
+    if not os.path.exists(font_path):
+        raise RuntimeError(f"Font non trovato: {font_path}")
+
     pdf.add_font("DejaVu", "", font_path, uni=True)
     pdf.set_font("DejaVu", "", 14)
-    pdf.cell(0, 10, txt=t["title"], ln=True, align="C")
+
+    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
     pdf.set_font("DejaVu", "", 12)
 
+    # Testo risultati
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
@@ -148,17 +162,11 @@ async def evaluate(
 {t['psa']}: {psa}
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
+
     pdf.multi_cell(0, 10, text)
+    pdf.image(temp_path, x=30, y=90, w=150)
 
-    # Calcolo dimensioni e centratura immagine
-    img_width = 120
-    img_height = img_width * h / w
-    x = (210 - img_width) / 2
-    y = pdf.get_y() + 10
-
-    pdf.image(temp_path, x=x, y=y, w=img_width, h=img_height)
-
-    pdf_data = pdf.output(dest="S").encode("latin1")
+    pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
@@ -175,4 +183,6 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
+
+# Serve il frontend React
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
