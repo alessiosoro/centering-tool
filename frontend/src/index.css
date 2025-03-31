@@ -257,3 +257,29 @@ button:hover {
   line-height: 1.5;
 }
 
+.language-panel {
+  display: flex;
+  justify-content: center;
+  margin: 12px auto 25px auto;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lang-btn {
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.lang-btn:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.lang-btn.active {
+  opacity: 1;
+  border-bottom: 2px solid #fff;
+}
