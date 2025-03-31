@@ -161,12 +161,8 @@ async def evaluate(
 
     # Font path in base alla lingua
     font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-    if lang == "zh":
-        font_path = os.path.join(font_dir, "NotoSansSC-Regular.otf")
-    elif lang == "ja":
-        font_path = os.path.join(font_dir, "NotoSansJP-Regular.otf")
-    elif lang == "ko":
-        font_path = os.path.join(font_dir, "NotoSansKR-Regular.otf")
+    if lang in ["zh", "ja", "ko"]:
+        font_path = os.path.join(font_dir, "NotoSansSC-Regular.ttf")  # ✅ compatibile con tutte
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
@@ -177,16 +173,16 @@ async def evaluate(
     try:
         print(f"🔤 Font selezionato: {font_path}")
         pdf.add_font("MainFont", "", font_path, uni=True)
+        pdf.set_font("MainFont", "", 14)
     except Exception as e:
         print(f"❌ Errore durante il caricamento del font: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-    pdf.set_font("MainFont", "", 14)
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-
     pdf.set_font("MainFont", "", 12)
+
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
