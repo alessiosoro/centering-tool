@@ -116,3 +116,4 @@ SGC: {sgc}"""
     })
 
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
+
