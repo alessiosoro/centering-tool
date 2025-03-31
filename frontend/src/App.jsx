@@ -3,6 +3,7 @@ import ImageUploader from "./components/ImageUploader";
 import CanvasRenderer from "./components/CanvasRenderer";
 import ResultEvaluator from "./components/ResultEvaluator";
 import Tabs from "./components/Tabs";
+import translations from "./lang";
 import "./index.css";
 
 function App() {
@@ -19,6 +20,8 @@ function App() {
     rightInner: 0.95,
   });
   const [result, setResult] = useState(null);
+  const [language, setLanguage] = useState("it");
+  const t = translations[language];
 
   const handleGuideChange = (key, value) => {
     setGuides((prev) => ({ ...prev, [key]: value }));
@@ -60,27 +63,61 @@ function App() {
     }
   }, [guides]);
 
+  const languages = [
+    { code: "it", flag: "🇮🇹" },
+    { code: "en", flag: "🇬🇧" },
+    { code: "fr", flag: "🇫🇷" },
+    { code: "de", flag: "🇩🇪" },
+    { code: "es", flag: "🇪🇸" },
+    { code: "pt", flag: "🇵🇹" },
+    { code: "zh", flag: "🇨🇳" },
+    { code: "ko", flag: "🇰🇷" },
+    { code: "ja", flag: "🇯🇵" },
+  ];
+
   return (
     <div>
-      <h1>Centering Tool</h1>
-      <Tabs />
+      <div className="header">
+        <h1>{t.title}</h1>
+        <p>{t.subtitle}</p>
+        <div className="language-switch">
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => setLanguage(lang.code)}
+              className={language === lang.code ? "active" : ""}
+              style={{ fontSize: "1.5rem", margin: "0 3px", cursor: "pointer" }}
+              title={lang.code.toUpperCase()}
+            >
+              {lang.flag}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Tabs translations={t} />
 
       {!imagePreview && (
-        <ImageUploader onImageUpload={handleUpload} />
+        <ImageUploader onImageUpload={handleUpload} translations={t} />
       )}
 
       {imagePreview && (
         <div className="container">
           <div className="image-section">
-            <CanvasRenderer image={imagePreview} guides={guides} onGuideChange={handleGuideChange} />
+            <CanvasRenderer
+              image={imagePreview}
+              guides={guides}
+              onGuideChange={handleGuideChange}
+              translations={t}
+            />
             <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-              <button onClick={resetApp}>🔄 Carica nuova immagine</button>
+              <button onClick={resetApp}>🔄 {t.resetButton}</button>
             </div>
           </div>
 
           {result && (
             <div className="results-section">
-              <ResultEvaluator result={result} />
+              <ResultEvaluator result={result} translations={t} />
             </div>
           )}
         </div>
