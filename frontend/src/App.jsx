@@ -31,7 +31,7 @@ function App() {
     setImageFile(file);
     setImagePreview(preview);
     setResult(null);
-    // Esegui subito l'analisi iniziale con lingua corrente
+    // Analisi iniziale
     setTimeout(() => {
       evaluateLive(file, guides, language);
     }, 100);
@@ -51,7 +51,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", currentFile);
     formData.append("guides", JSON.stringify(currentGuides));
-    formData.append("lang", currentLang); // ✅ lingua inviata correttamente
+    formData.append("lang", currentLang);
 
     try {
       const res = await fetch("/evaluate", {
@@ -72,11 +72,13 @@ function App() {
     }
   }, [guides]);
 
-  useEffect(() => {
+  // 🔥 IMPORTANTE: rianalizza subito con nuova lingua
+  const handleLanguageChange = (code) => {
+    setLanguage(code);
     if (imageFile) {
-      evaluateLive(imageFile, guides, language);
+      evaluateLive(imageFile, guides, code);
     }
-  }, [language]);
+  };
 
   const languages = [
     { code: "it", flag: "it" },
@@ -89,11 +91,6 @@ function App() {
     { code: "ko", flag: "kr" },
     { code: "ja", flag: "jp" },
   ];
-
-  const handleLanguageChange = (code) => {
-    setLanguage(code);
-    setResult(null); // ✅ reset dei risultati se cambio lingua
-  };
 
   return (
     <div>
