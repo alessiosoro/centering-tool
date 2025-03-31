@@ -52,14 +52,25 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
+        {/* LINEE GUIDA */}
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-
-          const guideStyle = isHorizontal
+          const style = isHorizontal
             ? { top: `${val * 100}%`, left: 0, width: "100%", height: "2px" }
             : { left: `${val * 100}%`, top: 0, height: "100%", width: "2px" };
 
-          const cursorStyle = isHorizontal
+          return (
+            <div
+              key={key}
+              className="guide-line"
+              style={{ ...style, backgroundColor: guideColors[key] }}
+            />
+          );
+        })}
+        {/* CURSORI */}
+        {Object.entries(guides).map(([key, val]) => {
+          const isHorizontal = key.includes("top") || key.includes("bottom");
+          const style = isHorizontal
             ? {
                 top: `${val * 100}%`,
                 left: "50%",
@@ -72,17 +83,12 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
               };
 
           return (
-            <React.Fragment key={key}>
-              <div
-                className="guide-line"
-                style={{ ...guideStyle, backgroundColor: guideColors[key] }}
-              />
-              <div
-                className="guide-cursor"
-                style={{ ...cursorStyle, backgroundColor: guideColors[key] }}
-                onMouseDown={(e) => handleMouseDown(e, key)}
-              />
-            </React.Fragment>
+            <div
+              key={`${key}-cursor`}
+              className="guide-cursor"
+              style={{ ...style, backgroundColor: guideColors[key] }}
+              onMouseDown={(e) => handleMouseDown(e, key)}
+            />
           );
         })}
       </div>
