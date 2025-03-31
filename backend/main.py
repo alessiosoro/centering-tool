@@ -62,7 +62,7 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni
+    # Traduzioni (estese)
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -131,7 +131,9 @@ async def evaluate(
         }
     }
 
-    t = translations.get(lang, translations["en"])
+    # 💡 Estrai solo il codice base della lingua (es. 'zh' da 'zh-CN')
+    lang_code = lang[:2].lower()
+    t = translations.get(lang_code, translations["en"])
 
     # Disegna linee guida
     colors = {
@@ -159,13 +161,13 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Font path in base alla lingua
+    # Selezione font
     font_dir = os.path.join(os.path.dirname(__file__), "fonts")
-    if lang == "zh":
+    if lang_code == "zh":
         font_path = os.path.join(font_dir, "NotoSansSC-Regular.otf")
-    elif lang == "ja":
+    elif lang_code == "ja":
         font_path = os.path.join(font_dir, "NotoSansJP-Regular.otf")
-    elif lang == "ko":
+    elif lang_code == "ko":
         font_path = os.path.join(font_dir, "NotoSansKR-Regular.otf")
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
@@ -191,12 +193,12 @@ async def evaluate(
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine
+    # Aggiungi immagine
     img_width = 150
     x_img = (210 - img_width) / 2
     pdf.image(temp_path, x=x_img, y=100, w=img_width)
 
-    # Codifica PDF
+    # Codifica PDF in base64
     pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
@@ -216,4 +218,3 @@ async def evaluate(
 
 # Static frontend
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
-
