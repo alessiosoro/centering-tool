@@ -28,12 +28,13 @@ async def evaluate(
     guides: str = Form(...),
     lang: str = Form("it")
 ):
+    # Carica immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcoli
+    # Calcolo mm reali
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -46,7 +47,6 @@ async def evaluate(
     verPercent = round((top / totalV) * 1000) / 10 if totalV else 0
     globalPercent = round((horPercent + verPercent) / 2, 1)
 
-    # Score
     def score(val, tol):
         dev = abs(val - 50)
         if dev <= tol:
@@ -64,7 +64,6 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -109,7 +108,6 @@ async def evaluate(
 
     t = translations.get(lang, translations["it"])
 
-    # Colori linee guida
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -130,25 +128,36 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
-    # Salvataggio immagine
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
+
+    print(f"[DEBUG] Immagine salvata in: {temp_path}")
+    print("File esiste?", os.path.exists(temp_path))
+    print("Dimensione:", os.path.getsize(temp_path) if os.path.exists(temp_path) else "n/a")
 
     # Genera PDF
     pdf = FPDF()
     pdf.add_page()
 
     font_path = os.path.join("fonts", "DejaVuSans.ttf")
-    if os.path.exists(font_path):
-        pdf.add_font("DejaVu", "", font_path, uni=True)
-        pdf.set_font("DejaVu", "", 14)
-    else:
+    font_exists = os.path.exists(font_path)
+    print(f"[DEBUG] Font trovato: {font_exists} ({font_path})")
+
+    try:
+        if font_exists:
+            pdf.add_font("DejaVu", "", font_path, uni=True)
+            pdf.set_font("DejaVu", "", 14)
+        else:
+            pdf.set_font("Arial", "", 14)
+    except Exception as e:
+        print("[ERRORE FONT]", e)
         pdf.set_font("Arial", "", 14)
 
-    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(0, 10, txt=t["title"], ln=True, border=1, align="C")
     pdf.ln(10)
-    pdf.set_font("DejaVu" if os.path.exists(font_path) else "Arial", "", 12)
+    pdf.set_font("DejaVu" if font_exists else "Arial", "", 12)
 
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
@@ -158,14 +167,19 @@ async def evaluate(
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
 
-    pdf.multi_cell(0, 10, text)
+    pdf.multi_cell(0, 10, text, border=1)
 
-    # Aggiungi immagine
     if os.path.exists(temp_path):
-        pdf.image(temp_path, x=30, w=150)
+        pdf.image(temp_path, x=30, y=100, w=150)
+        print("[DEBUG] Immagine inserita nel PDF")
 
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    # Export
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
+
+    # Debug PDF locale
+    with open("debug_output.pdf", "wb") as f:
+        f.write(pdf_data)
 
     return JSONResponse(content={
         "hor_percent": horPercent,
@@ -181,5 +195,5 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Serve React frontend
+# Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
