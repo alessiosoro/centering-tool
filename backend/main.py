@@ -27,13 +27,12 @@ async def evaluate(
     guides: str = Form(...),
     lang: str = Form("it")
 ):
-    # Carica immagine
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcoli in mm
+    # Calcoli
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -104,12 +103,11 @@ async def evaluate(
             "bgs": "BGS",
             "sgc": "SGC"
         },
-        # Aggiungi altre lingue se vuoi
     }
 
     t = translations.get(lang, translations["it"])
 
-    # Linee guida
+    # Disegna linee
     colors = {
         "topOuter": "#ff00ff",
         "topInner": "#ff69b4",
@@ -135,19 +133,21 @@ async def evaluate(
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Crea PDF
+    # PDF
     pdf = FPDF()
     pdf.add_page()
 
-    # ✅ Usa font assoluto
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSans.ttf")
-    pdf.add_font("DejaVu", "", font_path, uni=True)
-    pdf.set_font("DejaVu", "", 14)
+    if os.path.exists(font_path):
+        pdf.add_font("DejaVu", "", font_path, uni=True)
+        pdf.set_font("DejaVu", "", 14)
+    else:
+        pdf.set_font("Arial", "", 14)
 
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("DejaVu", "", 12)
+    pdf.set_font("DejaVu" if os.path.exists(font_path) else "Arial", "", 12)
 
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
@@ -160,11 +160,13 @@ async def evaluate(
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine sotto il testo
-    pdf.image(temp_path, x=30, y=100, w=150)
+    # Centra immagine
+    img_width = 150
+    x_img = (210 - img_width) / 2
+    pdf.image(temp_path, x=x_img, y=100, w=img_width)
 
-    # Base64 PDF
-    pdf_data = pdf.output(dest="S").encode("utf-8")
+    # Codifica PDF
+    pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
