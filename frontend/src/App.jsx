@@ -43,7 +43,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", imageFile);
     formData.append("guides", JSON.stringify(guides));
-    formData.append("lang", language); // ✅ Invio lingua corrente
+    formData.append("lang", language);
 
     try {
       const res = await fetch("/evaluate", {
@@ -82,13 +82,12 @@ function App() {
       <div className="header">
         <h1>{t.title}</h1>
         <p>{t.subtitle}</p>
-        <div className="language-switch">
+        <div className="language-panel">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => setLanguage(lang.code)}
-              className={language === lang.code ? "active" : ""}
-              style={{ fontSize: "1.5rem", margin: "0 3px", cursor: "pointer" }}
+              className={`lang-btn ${language === lang.code ? "active" : ""}`}
               title={lang.code.toUpperCase()}
             >
               {lang.flag}
