@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import "../index.css";
 
 const ResultEvaluator = ({ result, translations }) => {
   const t = translations;
-  const [pdfBase64, setPdfBase64] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  // ✅ Protezione contro dati incompleti o null
+  if (!result || !result.hor_percent) {
+    return (
+      <div className="result-box" style={{ color: "#ccc" }}>
+        📢 {t.resultTitle}: {t.noResults || "Nessun risultato disponibile."}
+      </div>
+    );
+  }
 
   const legenda = [
     { color: "#ff69b4", label: t.topInner },
@@ -16,27 +23,6 @@ const ResultEvaluator = ({ result, translations }) => {
     { color: "#00ffff", label: t.rightInner },
     { color: "#00bfff", label: t.rightOuter },
   ];
-
-  const generatePdf = async () => {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("file", result.originalFile); // 👈 questo campo deve essere passato dal componente padre!
-    formData.append("guides", JSON.stringify(result.guides));
-    formData.append("lang", result.lang);
-
-    try {
-      const res = await fetch("/evaluate", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      setPdfBase64(data.pdf_base64);
-    } catch (error) {
-      console.error("Errore generazione PDF:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div>
@@ -70,23 +56,6 @@ const ResultEvaluator = ({ result, translations }) => {
       <div className="result-box">
         <span className="badge">{t.sgc}</span> <strong>{result.sgc}</strong>
       </div>
-
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <button onClick={generatePdf} disabled={loading}>
-          📝 {loading ? "..." : t.generatePdfButton}
-        </button>
-      </div>
-
-      {pdfBase64 && (
-        <div style={{ marginTop: "10px", textAlign: "center" }}>
-          <a
-            href={`data:application/pdf;base64,${pdfBase64}`}
-            download="centering_report.pdf"
-          >
-            <button>📄 {t.downloadButton}</button>
-          </a>
-        </div>
-      )}
 
       <div className="legend">
         <h3>🎨 {t.resultTitle}</h3>
