@@ -38,7 +38,6 @@ button:hover {
   background-color: #666;
 }
 
-/* === CANVAS1 === */
 .canvas-container {
   display: flex;
   justify-content: center;
@@ -56,19 +55,20 @@ button:hover {
   display: block;
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  position: relative;
   z-index: 1;
 }
 
-/* === GUIDES === */
 .guide-line {
   position: absolute;
-  z-index: 5;
   pointer-events: none;
+  z-index: 5;
 }
 
 .guide-handle {
   position: absolute;
   pointer-events: all;
+  z-index: 10;
 }
 
 /* === LAYOUT === */
@@ -122,7 +122,6 @@ button:hover {
   font-weight: bold;
 }
 
-/* === UPLOADER === */
 .uploader {
   border: 2px dashed #666;
   padding: 30px;
