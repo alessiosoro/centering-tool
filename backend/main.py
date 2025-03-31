@@ -32,7 +32,6 @@ async def evaluate(
     w, h = image.size
     g = json.loads(guides)
 
-    # Calcoli
     left = abs((g["leftInner"] - g["leftOuter"]) * w)
     right = abs((g["rightOuter"] - g["rightInner"]) * w)
     top = abs((g["topInner"] - g["topOuter"]) * h)
@@ -62,7 +61,6 @@ async def evaluate(
     bgs = score(globalPercent, 3)
     sgc = score(globalPercent, 6)
 
-    # Traduzioni
     translations = {
         "it": {
             "title": "RISULTATI CENTERING",
@@ -103,31 +101,70 @@ async def evaluate(
             "bgs": "BGS",
             "sgc": "SGC"
         },
+        "de": {
+            "title": "ZENTRIERUNGSERGEBNISSE",
+            "horizontal": "Horizontal",
+            "vertical": "Vertikal",
+            "global": "Globale Zentrierung",
+            "left": "Links",
+            "right": "Rechts",
+            "top": "Oben",
+            "bottom": "Unten",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "es": {
+            "title": "RESULTADOS DE CENTRADO",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Centrado Global",
+            "left": "Izquierda",
+            "right": "Derecha",
+            "top": "Arriba",
+            "bottom": "Abajo",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "pt": {
+            "title": "RESULTADOS DE CENTRALIZAÇÃO",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Centralização Global",
+            "left": "Esquerda",
+            "right": "Direita",
+            "top": "Topo",
+            "bottom": "Fundo",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
         "zh": {
-            "title": "居中结果",
+            "title": "居中分析结果",
             "horizontal": "水平",
             "vertical": "垂直",
             "global": "整体居中",
-            "left": "左",
-            "right": "右",
-            "top": "上",
-            "bottom": "下",
-            "psa": "PSA 评分",
-            "bgs": "BGS 评分",
-            "sgc": "SGC 评分"
+            "left": "左侧",
+            "right": "右侧",
+            "top": "上侧",
+            "bottom": "下侧",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
         },
         "ko": {
-            "title": "센터링 결과",
+            "title": "중심 정렬 결과",
             "horizontal": "수평",
             "vertical": "수직",
-            "global": "전체 센터링",
+            "global": "전체 중심 정렬",
             "left": "왼쪽",
             "right": "오른쪽",
-            "top": "상단",
-            "bottom": "하단",
-            "psa": "PSA 점수",
-            "bgs": "BGS 점수",
-            "sgc": "SGC 점수"
+            "top": "위쪽",
+            "bottom": "아래쪽",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
         },
         "ja": {
             "title": "センタリング結果",
@@ -138,57 +175,54 @@ async def evaluate(
             "right": "右",
             "top": "上",
             "bottom": "下",
-            "psa": "PSA評価",
-            "bgs": "BGS評価",
-            "sgc": "SGC評価"
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
         }
     }
 
     t = translations.get(lang, translations["it"])
 
-    # Disegna linee guida
+    draw = ImageDraw.Draw(image)
     colors = {
-        "topOuter": "#ff00ff",
-        "topInner": "#ff69b4",
-        "bottomOuter": "#ffaa00",
-        "bottomInner": "#ffcc00",
-        "leftOuter": "#ff4444",
-        "leftInner": "#dd2222",
-        "rightOuter": "#00ffff",
-        "rightInner": "#00bfff",
+        "topOuter": "#ff00ff", "topInner": "#ff69b4",
+        "bottomOuter": "#ffaa00", "bottomInner": "#ffcc00",
+        "leftOuter": "#ff4444", "leftInner": "#dd2222",
+        "rightOuter": "#00ffff", "rightInner": "#00bfff",
     }
 
-    draw = ImageDraw.Draw(image)
     for key, val in g.items():
+        pos = int((w if "left" in key or "right" in key else h) * val)
         if "top" in key or "bottom" in key:
-            y = int(h * val)
-            draw.line([(0, y), (w, y)], fill=colors.get(key, "#ffffff"), width=2)
+            draw.line([(0, pos), (w, pos)], fill=colors[key], width=2)
         else:
-            x = int(w * val)
-            draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
+            draw.line([(pos, 0), (pos, h)], fill=colors[key], width=2)
 
-    # Salva immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Scegli font in base alla lingua
-    font_folder = os.path.join(os.path.dirname(__file__), "fonts")
-    if lang in ["zh", "ja", "ko"]:
-        font_file = os.path.join(font_folder, "NotoSansCJK-Regular.ttc")
-        font_name = "Noto"
-    else:
-        font_file = os.path.join(font_folder, "DejaVuSans.ttf")
-        font_name = "DejaVu"
+    # Font per lingua
+    font_dir = os.path.join(os.path.dirname(__file__), "fonts")
+    font_map = {
+        "zh": ("NotoZH", "NotoSansCJKsc-Regular.otf"),
+        "ja": ("NotoJP", "NotoSansCJKjp-Regular.otf"),
+        "ko": ("NotoKR", "NotoSansCJKkr-Regular.otf"),
+    }
 
-    # Crea PDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font(font_name, "", font_file, uni=True)
+
+    if lang in font_map:
+        font_name, font_file = font_map[lang]
+    else:
+        font_name, font_file = "Roboto", "Roboto-Regular.ttf"
+
+    font_path = os.path.join(font_dir, font_file)
+    pdf.add_font(font_name, "", font_path, uni=True)
     pdf.set_font(font_name, "", 14)
 
-    pdf.set_xy(10, 10)
-    pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
+    pdf.cell(200, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
     pdf.set_font(font_name, "", 12)
 
@@ -200,14 +234,10 @@ async def evaluate(
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
 
-    pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
+    x_img = (210 - 150) / 2
+    pdf.image(temp_path, x=x_img, y=100, w=150)
 
-    img_width = 150
-    x_img = (210 - img_width) / 2
-    pdf.image(temp_path, x=x_img, y=100, w=img_width)
-
-    # Codifica base64
     pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
@@ -225,5 +255,4 @@ async def evaluate(
         "pdf_base64": pdf_base64
     })
 
-# Static frontend (React build)
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
