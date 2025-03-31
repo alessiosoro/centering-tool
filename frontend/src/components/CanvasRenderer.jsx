@@ -42,44 +42,46 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
     <div className="canvas-container">
       <div className="image-wrapper" ref={wrapperRef}>
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
+
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-          const guideStyle = {
-  position: "absolute",
-  zIndex: 5,
-  backgroundColor: `var(--${key})`,
-  [isHorizontal ? "top" : "left"]: `${val * 100}%`,
-  width: isHorizontal ? "100%" : "2px",
-  height: isHorizontal
-    ? "2px"
-    : imageRef.current
-    ? `${imageRef.current.offsetHeight}px`
-    : "100%",
-  top: isHorizontal ? `${val * 100}%` : "0",
-};
 
+          const guideStyle = {
+            position: "absolute",
+            zIndex: 5,
+            backgroundColor: `var(--${key})`,
+            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
+            width: isHorizontal ? "100%" : "2px",
+            height: isHorizontal
+              ? "2px"
+              : imageRef.current
+              ? `${imageRef.current.offsetHeight}px`
+              : "100%",
+            top: isHorizontal ? `${val * 100}%` : "0",
+          };
 
           const handleStyle = {
             position: "absolute",
             zIndex: 10,
-            backgroundColor: `var(--${key})`,
+            cursor: "grab",
             width: "20px",
             height: "20px",
+            backgroundColor: `var(--${key})`,
+            border: "2px solid #fff",
             borderRadius: "4px",
-            cursor: "grab",
-            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
-            [isHorizontal ? "left" : "top"]: "50%",
             transform: "translate(-50%, -50%)",
+            [isHorizontal ? "left" : "top"]: `${val * 100}%`,
+            [isHorizontal ? "top" : "left"]: isHorizontal ? `${val * 100}%` : `${val * 100}%`,
           };
 
           return (
             <React.Fragment key={key}>
               <div className={`guide-line ${key}`} style={guideStyle}></div>
               <div
-                className={`guide-handle ${key}`}
+                className={`guide-handle ${isHorizontal ? "horizontal" : "vertical"}`}
                 style={handleStyle}
                 onMouseDown={(e) => handleMouseDown(e, key)}
-              ></div>
+              />
             </React.Fragment>
           );
         })}
