@@ -2,9 +2,20 @@ import React from "react";
 import "../index.css";
 
 const ResultEvaluator = ({ result }) => {
+  const legenda = [
+    { color: "#ff69b4", label: "Bordo Superiore Interno" },
+    { color: "#ff00ff", label: "Bordo Superiore Esterno" },
+    { color: "#ffcc00", label: "Bordo Inferiore Interno" },
+    { color: "#ffaa00", label: "Bordo Inferiore Esterno" },
+    { color: "#dd2222", label: "Bordo Sinistro Interno" },
+    { color: "#ff4444", label: "Bordo Sinistro Esterno" },
+    { color: "#00bfff", label: "Bordo Destro Interno" },
+    { color: "#00ffff", label: "Bordo Destro Esterno" },
+  ];
+
   return (
     <div>
-      <h2>Risultati</h2>
+      <h2>📊 Risultati</h2>
 
       <div className="result-box">
         <span>Orizzontale: <strong>{result.hor_percent}%</strong></span>
@@ -20,32 +31,19 @@ const ResultEvaluator = ({ result }) => {
 
       <div className="result-box">
         <span className="badge">Centratura Globale</span>
-        <strong>{Math.round((result.hor_percent + result.ver_percent) / 2)}%</strong>
+        <strong>{result.global_percent}%</strong>
       </div>
 
       <div className="result-box">
         <span className="badge">PSA</span> <strong>{result.psa}</strong>
       </div>
+
       <div className="result-box">
         <span className="badge">BGS</span> <strong>{result.bgs}</strong>
       </div>
+
       <div className="result-box">
         <span className="badge">SGC</span> <strong>{result.sgc}</strong>
-      </div>
-
-      {/* LEGENDA COLORI */}
-      <div className="result-box">
-        <h3 style={{ marginBottom: "8px" }}>Legenda</h3>
-        <ul className="legend-list">
-          <li><span className="legend-box topOuter"></span> BORDO SUPERIORE - Interno</li>
-          <li><span className="legend-box topInner"></span> BORDO SUPERIORE - Esterno</li>
-          <li><span className="legend-box bottomOuter"></span> BORDO INFERIORE - Interno</li>
-          <li><span className="legend-box bottomInner"></span> BORDO INFERIORE - Esterno</li>
-          <li><span className="legend-box leftOuter"></span> BORDO SINISTRO - Interno</li>
-          <li><span className="legend-box leftInner"></span> BORDO SINISTRO - Esterno</li>
-          <li><span className="legend-box rightOuter"></span> BORDO DESTRO - Interno</li>
-          <li><span className="legend-box rightInner"></span> BORDO DESTRO - Esterno</li>
-        </ul>
       </div>
 
       {result.pdf_base64 && (
@@ -58,6 +56,28 @@ const ResultEvaluator = ({ result }) => {
           </a>
         </div>
       )}
+
+      <div className="legend">
+        <h3>🎨 Legenda Bordi</h3>
+        <ul>
+          {legenda.map((item, idx) => (
+            <li key={idx}>
+              <span
+                className="color-box"
+                style={{
+                  backgroundColor: item.color,
+                  display: "inline-block",
+                  width: "16px",
+                  height: "16px",
+                  marginRight: "8px",
+                  borderRadius: "4px",
+                }}
+              ></span>
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
