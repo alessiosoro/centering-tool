@@ -51,7 +51,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", currentFile);
     formData.append("guides", JSON.stringify(currentGuides));
-    formData.append("lang", currentLang);
+    formData.append("lang", currentLang); // ✅ lingua inviata correttamente
 
     try {
       const res = await fetch("/evaluate", {
@@ -92,6 +92,7 @@ function App() {
 
   const handleLanguageChange = (code) => {
     setLanguage(code);
+    setResult(null); // ✅ reset dei risultati se cambio lingua
   };
 
   return (
@@ -99,7 +100,6 @@ function App() {
       <div className="header">
         <h1>{t.title}</h1>
         <div className="subtitle">{t.subtitle}</div>
-
         <div className="language-panel">
           {languages.map((lang) => (
             <button
@@ -117,13 +117,10 @@ function App() {
           ))}
         </div>
       </div>
-
       <Tabs translations={t} />
-
       {!imagePreview && (
         <ImageUploader onImageUpload={handleUpload} translations={t} />
       )}
-
       {imagePreview && (
         <div className="container">
           <div className="image-section">
@@ -137,7 +134,6 @@ function App() {
               <button onClick={resetApp}>🔄 {t.resetButton}</button>
             </div>
           </div>
-
           {result && (
             <div className="results-section">
               <ResultEvaluator result={result} translations={t} />
