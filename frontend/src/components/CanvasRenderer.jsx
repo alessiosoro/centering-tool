@@ -44,27 +44,22 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
         <img src={image} alt="Card" className="card-image" ref={imageRef} />
         {Object.entries(guides).map(([key, val]) => {
           const isHorizontal = key.includes("top") || key.includes("bottom");
-
-          const baseStyle = {
+          const guideStyle = {
             position: "absolute",
-            zIndex: 10,
+            zIndex: 5,
+            backgroundColor: `var(--${key})`,
+            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
             width: isHorizontal ? "100%" : "2px",
             height: isHorizontal ? "2px" : "100%",
-            backgroundColor: "transparent",
-          };
-
-          const guideLineStyle = {
-            ...baseStyle,
-            [isHorizontal ? "top" : "left"]: `${val * 100}%`,
           };
 
           const handleStyle = {
             position: "absolute",
+            zIndex: 10,
+            backgroundColor: `var(--${key})`,
             width: "20px",
             height: "20px",
-            backgroundColor: `var(--${key})`,
             borderRadius: "4px",
-            zIndex: 20,
             cursor: "grab",
             [isHorizontal ? "top" : "left"]: `${val * 100}%`,
             [isHorizontal ? "left" : "top"]: "50%",
@@ -73,7 +68,7 @@ const CanvasRenderer = ({ image, guides, onGuideChange }) => {
 
           return (
             <React.Fragment key={key}>
-              <div className={`guide-line ${key}`} style={guideLineStyle}></div>
+              <div className={`guide-line ${key}`} style={guideStyle}></div>
               <div
                 className={`guide-handle ${key}`}
                 style={handleStyle}
