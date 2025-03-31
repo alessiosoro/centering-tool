@@ -110,9 +110,15 @@ async def evaluate(
             font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
         # PDF
+        # Crea PDF
         pdf = FPDF()
         pdf.add_page()
-        pdf.add_font("MainFont", "", font_path, uni=True)
+
+        # DEBUG: stampa il font usato per capire se fallisce qui
+        print(f"🔤 Font selezionato: {font_path}")
+        pdf.add_font("MainFont", "", font_path, uni=True)  # 👈 punto critico
+
+        pdf.set_font("MainFont", "", 14)
         pdf.set_font("MainFont", "", 14)
         pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
         pdf.ln(10)
