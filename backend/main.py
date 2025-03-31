@@ -159,3 +159,4 @@ async def evaluate(
 
 # Frontend statico
 app.mount("/", StaticFiles(directory="frontend/build", html=True), name="static")
+
