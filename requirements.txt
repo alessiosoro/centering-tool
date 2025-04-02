@@ -3,3 +3,4 @@ uvicorn
 fpdf
 pillow
 python-multipart
+pytz
