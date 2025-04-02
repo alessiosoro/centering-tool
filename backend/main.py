@@ -9,6 +9,7 @@ import base64
 import json
 import tempfile
 import os
+import traceback
 
 app = FastAPI()
 
@@ -63,21 +64,85 @@ async def evaluate(
 
     # Traduzioni
     translations = {
-        "it": {"title": "RISULTATI CENTERING", "horizontal": "Orizzontale", "vertical": "Verticale", "global": "Centratura Globale", "left": "Sinistra", "right": "Destra", "top": "Alto", "bottom": "Basso", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "en": {"title": "CENTERING RESULTS", "horizontal": "Horizontal", "vertical": "Vertical", "global": "Global Centering", "left": "Left", "right": "Right", "top": "Top", "bottom": "Bottom", "psa": "PSA", "bgs": "BGS", "sgc": "SGC"},
-        "zh": {"title": "居中结果", "horizontal": "水平", "vertical": "垂直", "global": "整体居中", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA评分", "bgs": "BGS评分", "sgc": "SGC评分"},
-        "ja": {"title": "センタリング結果", "horizontal": "水平", "vertical": "垂直", "global": "全体のセンタリング", "left": "左", "right": "右", "top": "上", "bottom": "下", "psa": "PSA評価", "bgs": "BGS評価", "sgc": "SGC評価"},
-        "ko": {"title": "중심 정렬 결과", "horizontal": "수평", "vertical": "수직", "global": "전체 중심 정렬", "left": "왼쪽", "right": "오른쪽", "top": "상단", "bottom": "하단", "psa": "PSA 점수", "bgs": "BGS 점수", "sgc": "SGC 점수"},
+        "it": {
+            "title": "RISULTATI CENTERING",
+            "horizontal": "Orizzontale",
+            "vertical": "Verticale",
+            "global": "Centratura Globale",
+            "left": "Sinistra",
+            "right": "Destra",
+            "top": "Alto",
+            "bottom": "Basso",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "en": {
+            "title": "CENTERING RESULTS",
+            "horizontal": "Horizontal",
+            "vertical": "Vertical",
+            "global": "Global Centering",
+            "left": "Left",
+            "right": "Right",
+            "top": "Top",
+            "bottom": "Bottom",
+            "psa": "PSA",
+            "bgs": "BGS",
+            "sgc": "SGC"
+        },
+        "zh": {
+            "title": "居中结果",
+            "horizontal": "水平",
+            "vertical": "垂直",
+            "global": "整体居中",
+            "left": "左",
+            "right": "右",
+            "top": "上",
+            "bottom": "下",
+            "psa": "PSA评分",
+            "bgs": "BGS评分",
+            "sgc": "SGC评分"
+        },
+        "ja": {
+            "title": "センタリング結果",
+            "horizontal": "水平",
+            "vertical": "垂直",
+            "global": "全体のセンタリング",
+            "left": "左",
+            "right": "右",
+            "top": "上",
+            "bottom": "下",
+            "psa": "PSA評価",
+            "bgs": "BGS評価",
+            "sgc": "SGC評価"
+        },
+        "ko": {
+            "title": "중심 정렬 결과",
+            "horizontal": "수평",
+            "vertical": "수직",
+            "global": "전체 중심 정렬",
+            "left": "왼쪽",
+            "right": "오른쪽",
+            "top": "상단",
+            "bottom": "하단",
+            "psa": "PSA 점수",
+            "bgs": "BGS 점수",
+            "sgc": "SGC 점수"
+        }
     }
 
     t = translations.get(lang, translations["en"])
 
     # Disegna linee guida
     colors = {
-        "topOuter": "#ff00ff", "topInner": "#ff69b4",
-        "bottomOuter": "#ffaa00", "bottomInner": "#ffcc00",
-        "leftOuter": "#ff4444", "leftInner": "#dd2222",
-        "rightOuter": "#00ffff", "rightInner": "#00bfff",
+        "topOuter": "#ff00ff",
+        "topInner": "#ff69b4",
+        "bottomOuter": "#ffaa00",
+        "bottomInner": "#ffcc00",
+        "leftOuter": "#ff4444",
+        "leftInner": "#dd2222",
+        "rightOuter": "#00ffff",
+        "rightInner": "#00bfff",
     }
 
     draw = ImageDraw.Draw(image)
@@ -89,11 +154,12 @@ async def evaluate(
             x = int(w * val)
             draw.line([(x, 0), (x, h)], fill=colors.get(key, "#ffffff"), width=2)
 
+    # Salva immagine temporanea
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
         temp_path = tmp.name
         image.save(temp_path, format="JPEG")
 
-    # Font path e nome font
+    # Font path
     font_dir = os.path.join(os.path.dirname(__file__), "fonts")
     if lang == "zh":
         font_path = os.path.join(font_dir, "NotoSansSC-Regular.ttf")
@@ -104,17 +170,19 @@ async def evaluate(
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
-    font_name = "MainFont"
+    font_name = os.path.splitext(os.path.basename(font_path))[0]
 
+    # Crea PDF
     pdf = FPDF()
     pdf.add_page()
     try:
-        print("🔤 Font selezionato:", str(font_path))
+        print(f"🔤 Font selezionato: {font_path}")
         pdf.add_font(font_name, "", font_path, uni=True)
         pdf.set_font(font_name, "", 14)
     except Exception as e:
-        print("❌ Errore durante il caricamento del font:", str(e))
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        error_details = traceback.format_exc()
+        print(f"❌ Errore durante il caricamento del font:\n{error_details}")
+        return JSONResponse(content={"error": error_details}, status_code=500)
 
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
@@ -128,9 +196,11 @@ async def evaluate(
 {t['psa']}: {psa}
 {t['bgs']}: {bgs}
 {t['sgc']}: {sgc}"""
+
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
+    # Centra immagine correttamente
     img_width = 150
     img_ratio = image.height / image.width
     img_height = img_width * img_ratio
@@ -139,6 +209,7 @@ async def evaluate(
     y_img = max(10, min(y_img, 297 - img_height - 10))
     pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
+    # Codifica PDF
     pdf_data = pdf.output(dest="S").encode("latin1")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
