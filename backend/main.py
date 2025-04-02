@@ -208,8 +208,8 @@ async def evaluate(
     pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
     # Codifica PDF
-    pdf_data = pdf.output(dest="S").encode("utf-8")
-    pdf_base64 = base64.b64encode(pdf_data).decode()
+    pdf_bytes = pdf.output(dest="S").encode("latin1")
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("ascii")
 
     return JSONResponse(content={
         "hor_percent": horPercent,
