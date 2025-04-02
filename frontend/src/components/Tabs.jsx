@@ -1,44 +1,48 @@
 import React, { useState } from "react";
-import "../index.css";
 
-const Tabs = ({ translations }) => {
-  const [activeTab, setActiveTab] = useState("istruzioni");
-  const t = translations;
+const Tabs = ({ t, language, setLanguage }) => {
+  const [tab, setTab] = useState("tool");
+
+  const instructionsLabel = t?.instructionsTab || "📘 Instructions";
+  const toolLabel = t?.toolTab || "🛠️ Tool";
 
   return (
-    <div className="tabs-container">
+    <div className="tabs">
       <div className="tab-buttons">
-        <button
-          className={activeTab === "istruzioni" ? "active" : ""}
-          onClick={() => setActiveTab("istruzioni")}
-        >
-          {t.instructionsTab}
-        </button>
-        <button
-          className={activeTab === "disclaimer" ? "active" : ""}
-          onClick={() => setActiveTab("disclaimer")}
-        >
-          {t.disclaimerTitle}
-        </button>
+        <button onClick={() => setTab("tool")}>{toolLabel}</button>
+        <button onClick={() => setTab("instructions")}>{instructionsLabel}</button>
       </div>
 
       <div className="tab-content">
-        {activeTab === "istruzioni" && (
-          <div className="tab-panel">
-            <p>📤 {t.uploadInstruction}</p>
-            <p>🎯 {t.dragGuides}</p>
-            <p>📊 {t.resultTitle} {t.globalCentering.toLowerCase()} ({t.horizontal.toLowerCase()} / {t.vertical.toLowerCase()})</p>
-            <p>📄 {t.downloadButton}</p>
-            <p>🔁 {t.resetButton}</p>
+        {tab === "tool" && (
+          <p>{t?.toolContent || "Carica un'immagine e regola le guide per iniziare."}</p>
+        )}
+        {tab === "instructions" && (
+          <div>
+            <h2>{instructionsLabel}</h2>
+            <ul>
+              <li>📤 Carica un'immagine ad alta risoluzione</li>
+              <li>🎯 Posiziona i cursori sui bordi della carta</li>
+              <li>📊 Visualizza le percentuali e i margini</li>
+              <li>📄 Genera e scarica il PDF</li>
+            </ul>
           </div>
         )}
-        {activeTab === "disclaimer" && (
-          <div className="tab-panel">
-            {t.disclaimerParagraphs.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-        )}
+      </div>
+
+      <div className="language-switcher">
+        🌍
+        <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+          <option value="it">🇮🇹 Italiano</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="pt">🇵🇹 Português</option>
+          <option value="zh">🇨🇳 中文</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="ko">🇰🇷 한국어</option>
+        </select>
       </div>
     </div>
   );
