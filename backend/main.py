@@ -186,14 +186,14 @@ async def evaluate(
     pdf.ln(10)
 
     pdf.set_font("MainFont", "", 12)
-    text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
-{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
-{t['global']}: {globalPercent}%
-
-{t['psa']}: {psa}
-{t['bgs']}: {bgs}
-{t['sgc']}: {sgc}"""
-
+    text = (
+        f"{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)\n"
+        f"{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)\n"
+        f"{t['global']}: {globalPercent}%\n\n"
+        f"{t['psa']}: {str(psa)}\n"
+        f"{t['bgs']}: {str(bgs)}\n"
+        f"{t['sgc']}: {str(sgc)}"
+    )
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
