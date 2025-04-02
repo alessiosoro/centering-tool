@@ -86,10 +86,13 @@ async def evaluate(
         temp_img_path = tmp.name
         image.save(temp_img_path, format="JPEG")
 
-    # Traduzioni e font
+    # Percorso base
+    base_path = os.path.dirname(__file__)
+
+    # Traduzioni + font
     translations = {
         "it": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "RAPPORTO DI CENTERING",
             "site": "www.alexpuntoesse.com",
             "title": "DETTAGLI DI CENTERING",
@@ -105,7 +108,7 @@ async def evaluate(
             ]
         },
         "en": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "CENTERING REPORT",
             "site": "www.alexpuntoesse.com",
             "title": "CENTERING DETAILS",
@@ -121,7 +124,7 @@ async def evaluate(
             ]
         },
         "fr": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "RAPPORT DE CENTRAGE",
             "site": "www.alexpuntoesse.com",
             "title": "DÉTAILS DU CENTRAGE",
@@ -137,7 +140,7 @@ async def evaluate(
             ]
         },
         "de": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "ZENTRIERUNGSBERICHT",
             "site": "www.alexpuntoesse.com",
             "title": "ZENTRIERUNGSDATEN",
@@ -153,7 +156,7 @@ async def evaluate(
             ]
         },
         "es": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "INFORME DE CENTRADO",
             "site": "www.alexpuntoesse.com",
             "title": "DETALLES DE CENTRADO",
@@ -169,7 +172,7 @@ async def evaluate(
             ]
         },
         "pt": {
-            "font": "fonts/Roboto-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "Roboto-Regular.ttf"),
             "report": "RELATÓRIO DE CENTRALIZAÇÃO",
             "site": "www.alexpuntoesse.com",
             "title": "DETALHES DE CENTRALIZAÇÃO",
@@ -185,7 +188,7 @@ async def evaluate(
             ]
         },
         "zh": {
-            "font": "fonts/NotoSansSC-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "NotoSansSC-Regular.ttf"),
             "report": "报告",
             "site": "www.alexpuntoesse.com",
             "title": "居中详情",
@@ -201,7 +204,7 @@ async def evaluate(
             ]
         },
         "ko": {
-            "font": "fonts/NotoSansKR-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "NotoSansKR-Regular.ttf"),
             "report": "보고서",
             "site": "www.alexpuntoesse.com",
             "title": "센터링 세부 정보",
@@ -217,7 +220,7 @@ async def evaluate(
             ]
         },
         "ja": {
-            "font": "fonts/NotoSansJP-Regular.ttf",
+            "font": os.path.join(base_path, "fonts", "NotoSansJP-Regular.ttf"),
             "report": "センタリングレポート",
             "site": "www.alexpuntoesse.com",
             "title": "センタリング詳細",
@@ -238,7 +241,7 @@ async def evaluate(
     font_path = t["font"]
 
     # Immagini
-    assets_path = "assets"
+    assets_path = os.path.join(base_path, "assets")
     logo_path = os.path.join(assets_path, "logo.png")
     trainer_path = os.path.join(assets_path, "trainer.png")
     stamp_path = os.path.join(assets_path, "stamp.png")
@@ -246,7 +249,7 @@ async def evaluate(
     bgs_path = os.path.join(assets_path, f"BGS_{bgs}.png")
     sgc_path = os.path.join(assets_path, f"SGC_{sgc}.png")
 
-    # Crea PDF
+    # PDF
     pdf = FPDF("P", "mm", "A4")
     pdf.set_auto_page_break(auto=False)
     pdf.add_page()
