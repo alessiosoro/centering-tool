@@ -191,14 +191,14 @@ async def evaluate(
         f"{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)\n"
         f"{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)\n"
         f"{t['global']}: {globalPercent}%\n\n"
-        f"{t['psa']}: {str(psa)}\n"
-        f"{t['bgs']}: {str(bgs)}\n"
-        f"{t['sgc']}: {str(sgc)}"
+        f"{t['psa']}: {psa}\n"
+        f"{t['bgs']}: {bgs}\n"
+        f"{t['sgc']}: {sgc}"
     )
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine correttamente
+    # Centra immagine
     img_width = 150
     img_ratio = image.height / image.width
     img_height = img_width * img_ratio
@@ -207,8 +207,8 @@ async def evaluate(
     y_img = max(10, min(y_img, 297 - img_height - 10))
     pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
-    # Codifica PDF
-    pdf_data = pdf.output(dest="S").encode("latin1")
+    # Codifica PDF (FIX encoding)
+    pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
