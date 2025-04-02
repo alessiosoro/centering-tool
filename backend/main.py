@@ -175,17 +175,18 @@ async def evaluate(
     pdf.add_page()
     try:
         print(f"🔤 Font selezionato: {font_path}")
-        pdf.add_font("MainFont", "", font_path, uni=True)
+        font_name = os.path.basename(font_path).split(".")[0]
+        pdf.add_font(font_name, "", font_path, uni=True)
     except Exception as e:
         print(f"❌ Errore durante il caricamento del font: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-    pdf.set_font("MainFont", "", 14)
+    pdf.set_font(font_name, "", 14)
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
 
-    pdf.set_font("MainFont", "", 12)
+    pdf.set_font(font_name, "", 12)
     text = (
         f"{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)\n"
         f"{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)\n"
