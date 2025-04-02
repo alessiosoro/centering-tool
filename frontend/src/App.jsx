@@ -23,8 +23,10 @@ function App() {
   const [pdfBase64, setPdfBase64] = useState(null);
   const [language, setLanguage] = useState("it");
 
+  // fallback automatico in caso di lingua assente
   const t = translations[language] || translations["en"];
 
+  // debug log
   console.log("🌐 Lingua selezionata:", language);
   console.log("📘 Traduzioni caricate:", t);
 
@@ -73,20 +75,18 @@ function App() {
     }
   };
 
-  // 🔁 Triggera nuova valutazione quando cambiano i cursori (guides)
+  // 🔁 Valuta ogni volta che cambiano i cursori
   useEffect(() => {
     if (imageFile) {
       const timeout = setTimeout(() => {
         evaluateLive(imageFile, guides, language);
-      }, 200); // debounce 200ms
+      }, 200);
       return () => clearTimeout(timeout);
     }
   }, [guides]);
 
   return (
     <div className="App">
-      <h1>{t.title}</h1>
-      <p>{t.subtitle}</p>
       <ImageUploader onImageUpload={handleUpload} translations={t} />
       {imagePreview && (
         <CanvasRenderer
@@ -95,10 +95,17 @@ function App() {
           onGuideChange={handleGuideChange}
         />
       )}
-      {result && <ResultEvaluator result={result} pdfBase64={pdfBase64} t={t} />}
-      <Tabs t={t} language={language} setLanguage={setLanguage} />
+      {result && (
+        <ResultEvaluator
+          result={result}
+          pdfBase64={pdfBase64}
+          t={t}
+          language={language}
+        />
+      )}
+      <Tabs translations={t} />
       <button className="reset-button" onClick={resetApp}>
-        🔄 {t.reset || "Reset"}
+        🔁 {t.resetButton}
       </button>
     </div>
   );
