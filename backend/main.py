@@ -169,15 +169,13 @@ async def evaluate(
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
-    font_name = os.path.splitext(os.path.basename(font_path))[0]
-
     # Crea PDF
     pdf = FPDF()
     pdf.add_page()
     try:
         print(f"🔤 Font selezionato: {font_path}")
-        pdf.add_font(font_name, "", font_path, uni=True)
-        pdf.set_font(font_name, "", 14)
+        pdf.add_font("MainFont", "", font_path, uni=True)
+        pdf.set_font("MainFont", "", 14)
     except Exception as e:
         print(f"❌ Errore durante il caricamento del font: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
@@ -186,7 +184,7 @@ async def evaluate(
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
 
-    pdf.set_font(font_name, "", 12)
+    pdf.set_font("MainFont", "", 12)
     text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
 {t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
 {t['global']}: {globalPercent}%
@@ -208,8 +206,8 @@ async def evaluate(
     pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
     # Codifica PDF
-    pdf_bytes = pdf.output(dest="S").encode("latin1")
-    pdf_base64 = base64.b64encode(pdf_bytes).decode("ascii")
+    pdf_data = pdf.output(dest="S").encode("latin1")
+    pdf_base64 = base64.b64encode(pdf_data).decode()
 
     return JSONResponse(content={
         "hor_percent": horPercent,
