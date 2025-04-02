@@ -69,46 +69,131 @@ function App() {
       const data = await res.json();
       const { pdf_base64, ...rest } = data;
       setResult(rest);
-      setPdfBase64(pdf_base64);
-    } catch (err) {
-      console.error("❌ Errore nella valutazione:", err);
+      setPdfBase64(null); // PDF va generato manualmente
+    } catch (error) {
+      console.error("Errore analisi live:", error);
     }
   };
 
-  // 🔁 Valuta ogni volta che cambiano i cursori
+  const generatePDF = async () => {
+    if (!imageFile) return;
+
+    const formData = new FormData();
+    formData.append("file", imageFile);
+    formData.append("guides", JSON.stringify(guides));
+    formData.append("lang", language);
+
+    try {
+      const res = await fetch("/evaluate", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.pdf_base64) {
+        setPdfBase64(data.pdf_base64);
+      }
+    } catch (error) {
+      console.error("Errore generazione PDF:", error);
+    }
+  };
+
   useEffect(() => {
     if (imageFile) {
-      const timeout = setTimeout(() => {
-        evaluateLive(imageFile, guides, language);
-      }, 200);
-      return () => clearTimeout(timeout);
+      evaluateLive(imageFile, guides, language);
     }
   }, [guides]);
 
-  return (
-    <div className="App">
-      <ImageUploader onImageUpload={handleUpload} translations={t} />
-      {imagePreview && (
-        <CanvasRenderer
-          imagePreview={imagePreview}
-          guides={guides}
-          onGuideChange={handleGuideChange}
-        />
-      )}
-      {result && (
-        <ResultEvaluator
-          result={result}
-          pdfBase64={pdfBase64}
-          t={t}
-          language={language}
-        />
-      )}
-      <Tabs translations={t} />
-      <button className="reset-button" onClick={resetApp}>
-        🔁 {t.resetButton}
-      </button>
-    </div>
-  );
+  useEffect(() => {
+    if (imageFile) {
+      evaluateLive(imageFile, guides, language);
+    }
+  }, [language]);
+
+  const languages = [
+    { code: "it", flag: "it" },
+    { code: "en", flag: "gb" },
+    { code: "fr", flag: "fr" },
+    { code: "de", flag: "de" },
+    { code: "es", flag: "es" },
+    { code: "pt", flag: "pt" },
+    { code: "zh", flag: "cn" },
+    { code: "ko", flag: "kr" },
+    { code: "ja", flag: "jp" },
+  ];
+
+  const handleLanguageChange = (code) => {
+    setLanguage(code);
+    setResult(null);
+    setPdfBase64(null);
+    if (imageFile) {
+      evaluateLive(imageFile, guides, code);
+    }
+  };
+
+  // wrapper con try/catch per bloccare crash
+  try {
+    return (
+      <div>
+        <div className="header">
+          <h1>{t.title}</h1>
+          <div className="subtitle">{t.subtitle}</div>
+          <div className="language-panel">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className={`lang-btn ${language === lang.code ? "active" : ""}`}
+                title={lang.code.toUpperCase()}
+              >
+                <img
+                  src={`https://flagcdn.com/24x18/${lang.flag}.png`}
+                  alt={lang.code}
+                  className="flag-icon"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+        <Tabs translations={t} />
+        {!imagePreview && (
+          <ImageUploader onImageUpload={handleUpload} translations={t} />
+        )}
+        {imagePreview && (
+          <div className="container">
+            <div className="image-section">
+              <CanvasRenderer
+                image={imagePreview}
+                guides={guides}
+                onGuideChange={handleGuideChange}
+                translations={t}
+              />
+              <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+                <button onClick={resetApp}>🔄 {t.resetButton}</button>
+                <button onClick={generatePDF}>📄 {t.generatePdfButton}</button>
+                {pdfBase64 && (
+                  <a
+                    href={`data:application/pdf;base64,${pdfBase64}`}
+                    download="centering_report.pdf"
+                  >
+                    <button>⬇️ {t.downloadButton}</button>
+                  </a>
+                )}
+              </div>
+            </div>
+            {result && (
+              <div className="results-section">
+                <ResultEvaluator result={result} translations={t} />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  } catch (err) {
+    console.error("🔥 Errore rendering App.jsx:", err);
+    return <div style={{ color: "red", textAlign: "center" }}>❌ Errore: {err.message}</div>;
+  }
 }
 
 export default App;
