@@ -2,7 +2,6 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from typing import Dict
 from PIL import Image, ImageDraw
 from fpdf import FPDF
 import io
@@ -170,35 +169,36 @@ async def evaluate(
     else:
         font_path = os.path.join(font_dir, "Roboto-Regular.ttf")
 
+    font_name = os.path.splitext(os.path.basename(font_path))[0]
+
     # Crea PDF
     pdf = FPDF()
     pdf.add_page()
     try:
         print(f"🔤 Font selezionato: {font_path}")
-        font_name = os.path.basename(font_path).split(".")[0]
         pdf.add_font(font_name, "", font_path, uni=True)
+        pdf.set_font(font_name, "", 14)
     except Exception as e:
         print(f"❌ Errore durante il caricamento del font: {e}")
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-    pdf.set_font(font_name, "", 14)
     pdf.set_xy(10, 10)
     pdf.cell(190, 10, txt=t["title"], ln=True, align="C")
     pdf.ln(10)
 
     pdf.set_font(font_name, "", 12)
-    text = (
-        f"{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)\n"
-        f"{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)\n"
-        f"{t['global']}: {globalPercent}%\n\n"
-        f"{t['psa']}: {psa}\n"
-        f"{t['bgs']}: {bgs}\n"
-        f"{t['sgc']}: {sgc}"
-    )
+    text = f"""{t['horizontal']}: {horPercent}% ({left:.2f} mm / {right:.2f} mm)
+{t['vertical']}: {verPercent}% ({top:.2f} mm / {bottom:.2f} mm)
+{t['global']}: {globalPercent}%
+
+{t['psa']}: {psa}
+{t['bgs']}: {bgs}
+{t['sgc']}: {sgc}"""
+
     pdf.set_x(20)
     pdf.multi_cell(0, 10, text)
 
-    # Centra immagine
+    # Centra immagine correttamente
     img_width = 150
     img_ratio = image.height / image.width
     img_height = img_width * img_ratio
@@ -207,7 +207,7 @@ async def evaluate(
     y_img = max(10, min(y_img, 297 - img_height - 10))
     pdf.image(temp_path, x=x_img, y=y_img, w=img_width)
 
-    # Codifica PDF (FIX encoding)
+    # Codifica PDF
     pdf_data = pdf.output(dest="S").encode("utf-8")
     pdf_base64 = base64.b64encode(pdf_data).decode()
 
